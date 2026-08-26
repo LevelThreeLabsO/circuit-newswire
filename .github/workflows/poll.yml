@@ -1,0 +1,43 @@
+name: newswire
+
+on:
+  # Pinged every ~15 min by cron-job.org via the workflow_dispatch API, the same pattern
+  # as the article watchers. GitHub's own schedule below is a laggy fallback: it drifts
+  # by five to fifteen minutes under load, which a 25-minute freshness window absorbs
+  # but a tighter one would not.
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+# poll.py commits watcher_state.json and status.json back after each run.
+permissions:
+  contents: write
+
+# One run at a time. Note what is NOT here: any in-code concurrency lock. Two separate
+# outages in the JI original came from the guard rather than from concurrency — a real
+# lock wedged permanently when a run was killed while holding it, and its self-expiring
+# replacement then turned away two scheduled runs. Claim-before-send already prevents
+# double posting; overlapping runs merely waste effort, while a wedged guard stops
+# everything. cancel-in-progress stays false so a run is never killed mid-post.
+concurrency:
+  group: poll
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python poll.py
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # Runs on failure too: status.json is most useful precisely when the run broke,
+      # and it is the only thing that will explain why after the fact.
+      - if: always()
+        run: python poll.py --status

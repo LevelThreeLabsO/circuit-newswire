@@ -1,0 +1,326 @@
+#!/usr/bin/env python3
+"""The Circuit newswire: one run.
+
+Reads every source in sources.yaml, keeps what scores as Gulf-business relevant, drops
+what has already been posted or is the same story someone else just filed, and posts one
+bundled digest to Slack. Single-shot — one invocation per GitHub Actions tick.
+
+    python3 poll.py                      real run (needs SLACK_WEBHOOK_URL)
+    python3 poll.py --dry-run            print the digest, post nothing, touch no state
+    python3 poll.py --dry-run --window-hours 24 --source agbi
+    python3 poll.py --audit              every source: alive, fresh, parseable
+    python3 poll.py --selftest           scoring recall + noise rate against fixtures
+    python3 poll.py --score "headline"   score one headline and show which axes hit
+    python3 poll.py --test-webhook       assert Slack answers `ok`
+    python3 poll.py --status             print status.json
+
+Gate order matters — an item rejected at gate 3 is never seen by gate 4:
+
+    1 fetch      every source, threaded
+    2 fresh      within that source's own window
+    3 relevant   four-axis score >= the source's threshold
+    4 unseen     not already posted, by URL hash and by headline hash
+    5 unique     not the story another outlet just filed
+    6 post       one bundled message, newest first, capped
+
+Claim-before-send is the load-bearing rule: keys are written to state *before* the post
+goes out, and rolled back if Slack refuses. Marking after sending means two overlapping
+runs both read an empty store and both send the same digest; not rolling back means a
+delivery outage eats the coverage instead of queueing it.
+
+There is deliberately no concurrency lock. The workflow serializes runs, and in the
+original two separate outages came from the guard rather than from concurrency — a real
+lock wedged permanently when a run was killed while holding it, and its self-expiring
+replacement then turned away two scheduled runs.
+"""
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+import yaml
+from dotenv import load_dotenv
+
+from src import dedup, digest, state, status
+from src.fetch import Item, ParseFailure, fetch_all, now_utc
+from src.score import Scorer
+from src.slack_client import DeliveryError, SlackClient
+
+load_dotenv()
+
+ROOT = Path(__file__).resolve().parent
+SOURCES_FILE = ROOT / "sources.yaml"
+DISPATCH_MINUTES = 15
+
+
+def load_sources(only: list[str] | None) -> tuple[list[dict], dict]:
+    config = yaml.safe_load(SOURCES_FILE.read_text()) or {}
+    sources = [s for s in config.get("sources", []) if s.get("enabled", True)]
+    if only:
+        wanted = set(only)
+        sources = [s for s in sources if s["key"] in wanted]
+        missing = wanted - {s["key"] for s in sources}
+        if missing:
+            sys.exit(f"unknown source key(s): {', '.join(sorted(missing))}")
+    return sources, config
+
+
+def check_windows(sources: list[dict]) -> list[str]:
+    """A window shorter than the dispatch interval loses items in two ways.
+
+    It leaves gaps (a story published between runs falls outside both windows), and it
+    means anything trimmed by the digest cap is gone before the next run can pick it up.
+    The cap only holds items over safely because the window outlives the interval.
+    """
+    return [
+        s["key"] for s in sources
+        if s.get("window_minutes", 25) <= DISPATCH_MINUTES
+    ]
+
+
+def run(args) -> int:
+    scorer = Scorer()
+    if scorer.config.get("judge"):
+        scorer.judge_hook("", "")  # raises loudly — see score.py
+
+    sources, config = load_sources(args.source)
+    max_items = args.max_items or config.get("max_items", digest.MAX_ITEMS)
+    now = now_utc()
+    run_status = status.Run()
+    slack = SlackClient()
+    mode = "DRY-RUN" if args.dry_run else "LIVE"
+
+    if not args.dry_run and not slack.configured:
+        sys.exit("SLACK_WEBHOOK_URL is not set. Use --dry-run to inspect without posting.")
+
+    tight = check_windows(sources)
+    if tight:
+        print(f"  ! window_minutes <= dispatch interval for: {', '.join(tight)}")
+
+    print(f"[{mode}] {len(sources)} sources, threshold {scorer.default_threshold}, "
+          f"cap {max_items}")
+
+    # ---- gate 1 + 2: fetch, within each source's own window -----------------
+    candidates: list[Item] = []
+    for source, items, entries, exc in fetch_all(sources, now, args.window_hours):
+        key = source["key"]
+        if exc is not None:
+            if isinstance(exc, ParseFailure):
+                run_status.source_parse_fail(key, str(exc))
+                print(f"  ! {key:22} PARSE FAILURE: {exc}")
+            else:
+                run_status.source_error(key, exc)
+                print(f"  ! {key:22} {type(exc).__name__}: {exc}")
+            continue
+        run_status.source_ok(key, len(items), entries)
+        print(f"    {key:22} {len(items):3} in window / {entries:3} in feed")
+        candidates.extend(items)
+
+    run_status.gate("fetched", len(candidates))
+
+    # ---- first run: baseline silently rather than dumping the backlog -------
+    live_state = state.blank() if args.dry_run else state.latest()
+    if not args.dry_run and not state.exists():
+        keys = [k for item in candidates for k in dedup.keys_for(item)]
+        state.claim(live_state, keys)
+        slack.post(
+            ":satellite: Circuit newswire is live. Gulf business stories will appear "
+            "here as they publish."
+        )
+        run_status.delivered = True
+        state.record(live_state)
+        run_status.write()
+        print(f"First run — baselined {len(candidates)} items, posted hello.")
+        return 0
+
+    # ---- gate 2b: undated items age on when we first saw them --------------
+    # Some feeds carry no timestamp at all. The freshness gate then never applies to
+    # them and they stay eligible forever, reposting endlessly.
+    windows = {s["key"]: s.get("window_minutes", 25) for s in sources}
+    fresh: list[Item] = []
+    for item in candidates:
+        if item.published:
+            item.effective_date = item.published
+            fresh.append(item)
+            continue
+        first_seen = state.stamp_first_seen(live_state, dedup.url_key(item))
+        item.effective_date = first_seen
+        age_minutes = (now - first_seen).total_seconds() / 60
+        # Age an undated item on its first sighting, generously — the point is only to
+        # stop it living forever, not to race it out of the window on the next tick.
+        allowance = max(windows.get(item.source_key, 25), DISPATCH_MINUTES * 2)
+        if age_minutes <= allowance:
+            fresh.append(item)
+    run_status.gate("fresh", len(fresh))
+
+    # ---- gate 3: relevance --------------------------------------------------
+    scored: list[Item] = []
+    for item in fresh:
+        verdict = scorer.score(item.title, item.body, item.author)
+        item.score, item.axes = verdict.score, verdict.axes
+        if scorer.admits(verdict, item.threshold):
+            item.category = scorer.categorize(item.title, item.body)
+            scored.append(item)
+        elif args.dry_run and args.verbose:
+            why = f"veto:{verdict.vetoed}" if verdict.vetoed else f"score {verdict.score}"
+            print(f"  · drop [{why}] {item.outlet}: {item.title[:70]}")
+    run_status.gate("relevant", len(scored))
+
+    # ---- gate 4: not already posted ---------------------------------------
+    seen = live_state["seen"]
+    unseen = [i for i in scored if not dedup.already_posted(i, seen)]
+    run_status.gate("unseen", len(unseen))
+
+    # ---- gate 5: not the same story another outlet just filed -------------
+    unique: list[Item] = []
+    recent = list(live_state["titles"])
+    for item in sorted(unseen, key=lambda i: i.effective_date or now):
+        match = dedup.cross_outlet_match(item, recent)
+        if match:
+            if args.dry_run and args.verbose:
+                print(f"  · dup of {match.get('outlet')}: {item.title[:70]}")
+            continue
+        unique.append(item)
+        recent.append({"words": dedup.title_words(item.title), "at": "", "outlet": item.outlet})
+    run_status.gate("unique", len(unique))
+
+    # ---- gate 6: post ------------------------------------------------------
+    if not unique:
+        print("Nothing to post.")
+        _housekeeping(run_status, slack, live_state, args)
+        return 0
+
+    text, included = digest.build(unique, now, max_items)
+    run_status.gate("posted", len(included))
+
+    if args.dry_run:
+        print("\n" + "-" * 72 + "\n" + text + "\n" + "-" * 72)
+        print(f"\n[DRY-RUN] would post {len(included)} item(s); state untouched.")
+        return 0
+
+    # Claim before sending — and only what is actually in this message, so items the cap
+    # held over stay unclaimed and the next run can post them.
+    claimed = [k for item in included for k in dedup.keys_for(item)]
+    state.claim(live_state, claimed)
+    for item in included:
+        state.remember_title(live_state, dedup.title_words(item.title), item.outlet)
+
+    try:
+        slack.post(text)
+    except DeliveryError as e:
+        state.unclaim(live_state, claimed)   # nothing is consumed by a failed delivery
+        run_status.delivered = False
+        run_status.failed(e)
+        state.record(live_state)
+        run_status.write()
+        print(f"DELIVERY FAILED: {e}", file=sys.stderr)
+        return 1
+
+    run_status.delivered = True
+    run_status.posted = len(included)
+    print(f"Posted {len(included)} item(s).")
+    _housekeeping(run_status, slack, live_state, args)
+    return 0
+
+
+def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, args) -> None:
+    """Self-reporting, then persist.
+
+    An automation that cannot say when it is broken makes its owner the monitoring
+    system. Two alarms: prolonged silence, and any source that has gone quiet or
+    unparseable for long enough that a dead feed is the likelier explanation.
+    """
+    alerts = []
+    quiet = run_status.hours_since_post()
+    if quiet is not None and quiet >= 6 and not run_status.posted:
+        alerts.append(f":mute: No Circuit newswire items posted in {quiet:.0f}h. "
+                      "Either the Gulf is quiet or something upstream is broken.")
+    stale = run_status.stale_sources()
+    if stale:
+        alerts.append(":broken_heart: Sources returning nothing for 48h+: "
+                      f"{', '.join(stale)}. A dead feed answers HTTP 200 — worth a look.")
+
+    if not args.dry_run:
+        for message in alerts:
+            try:
+                slack.post(message)
+            except DeliveryError as e:
+                print(f"  ! could not post health alert: {e}", file=sys.stderr)
+        state.record(live_state)
+    else:
+        for message in alerts:
+            print(f"  (would alert) {message}")
+    doc = run_status.write()
+    print(f"Run took {doc['duration_seconds']}s.")
+
+
+# --------------------------------------------------------------------- subcommands
+
+def cmd_status() -> int:
+    print(status.summarize(status.load()))
+    return 0
+
+
+def cmd_score(text: str) -> int:
+    scorer = Scorer()
+    v = scorer.score(text)
+    print(f"score {v.score} (threshold {scorer.default_threshold}) "
+          f"-> {'ADMIT' if scorer.admits(v) else 'DROP'}")
+    print(f"axes    {', '.join(v.axes) or '(none)'}")
+    print(f"matched {', '.join(v.matched) or '(none)'}")
+    if v.vetoed:
+        print(f"vetoed  {v.vetoed}")
+    return 0
+
+
+def cmd_test_webhook() -> int:
+    slack = SlackClient()
+    try:
+        slack.post(":wrench: Circuit newswire webhook test — delivery confirmed.")
+    except DeliveryError as e:
+        print(f"FAILED: {e}", file=sys.stderr)
+        return 1
+    print("Slack accepted the message (`ok`).")
+    return 0
+
+
+def cmd_selftest() -> int:
+    from tests.selftest import main as selftest_main
+    return selftest_main()
+
+
+def cmd_audit(args) -> int:
+    from audit_sources import main as audit_main
+    return audit_main(args.source)
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(description="The Circuit newswire")
+    p.add_argument("--dry-run", action="store_true", help="print, don't post; don't touch state")
+    p.add_argument("--verbose", "-v", action="store_true", help="show what was dropped and why")
+    p.add_argument("--window-hours", type=float, default=None, help="override every source's window")
+    p.add_argument("--source", action="append", help="limit to source key(s); repeatable")
+    p.add_argument("--max-items", type=int, default=None, help="override the digest cap")
+    p.add_argument("--status", action="store_true", help="print status.json and exit")
+    p.add_argument("--score", metavar="HEADLINE", help="score one headline and exit")
+    p.add_argument("--test-webhook", action="store_true", help="post a test message and exit")
+    p.add_argument("--selftest", action="store_true", help="scoring recall/noise fixtures")
+    p.add_argument("--audit", action="store_true", help="audit every source's feed health")
+    args = p.parse_args()
+
+    if args.status:
+        return cmd_status()
+    if args.score:
+        return cmd_score(args.score)
+    if args.test_webhook:
+        return cmd_test_webhook()
+    if args.selftest:
+        return cmd_selftest()
+    if args.audit:
+        return cmd_audit(args)
+    return run(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

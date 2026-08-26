@@ -1,0 +1,810 @@
+# Relevance vocabulary. Data, not logic — poll.py re-reads this every run.
+#
+# Built from 269 of The Circuit's own story headlines (Feb–Aug 2026), not from guesswork.
+# See src/score.py for why the axes are weighted the way they are; the short version is
+# that geography is worth 2 and the threshold is 4, so no country term can admit a story
+# on its own. Run `python3 poll.py --selftest` after any edit here: it reports recall
+# against Circuit's real headlines and the pass rate against a tabloid negative set, so
+# a word you add shows its cost as well as its benefit.
+
+default_threshold: 4
+money_points: 1
+money_pattern: '\$|\bbillion\b|\bmillion\b|\btrillion\b|\bbn\b|\d+\s?%|\bper cent\b|\bpercent\b'
+
+# The dormant judge seam. Setting this true without implementing one is refused loudly.
+judge: false
+
+axes:
+  # ── Named commercial entities ──────────────────────────────────────────────
+  # A company or a fund is a business story by definition, so these carry enough to need
+  # only one companion signal. This roster does the heaviest lifting in the whole file
+  # and is the part to keep current: every Circuit story that mentions no country still
+  # names one of these ("Zain to build Syria's second mobile network", "Uber increases
+  # Careem stake", "Core42 expands AI business in New York").
+  - name: entity
+    points: 3
+    terms:
+      # Sovereign wealth and state holding companies
+      - PIF
+      - Public Investment Fund
+      - Mubadala
+      - ADIA
+      - ADQ
+      - QIA
+      - Qatar Investment Authority
+      - Kuwait Investment Authority
+      - KIA
+      - Investment Corporation of Dubai
+      - ICD
+      - Oman Investment Authority
+      - Mumtalakat
+      - IHC
+      - International Holding Company
+      - 2PointZero
+      - Alpha Dhabi
+      - Multiply Group
+      - Lunate
+      - Sanabil
+      - Jada
+      - Alat
+      - Investcorp
+      - Gulf Capital
+      - Global SWF
+      # Tech, AI and space
+      - MGX
+      - G42
+      - Core42
+      - Space42
+      - Presight
+      - Bayanat
+      - Yahsat
+      - Tahaluf
+      - Humain
+      - Fasset
+      - Cerebras
+      # Energy
+      - ADNOC
+      - XRG
+      - Aramco
+      - Saudi Aramco
+      - QatarEnergy
+      - KPC
+      - Kuwait Petroleum
+      - PDO
+      - Masdar
+      - ACWA Power
+      - TAQA
+      - DEWA
+      - SEWA
+      - Nakilat
+      - Ma'aden
+      - Maaden
+      - SABIC
+      - Borouge
+      - Fertiglobe
+      - Dana Gas
+      - Crescent Petroleum
+      # Ports, logistics, transport
+      - DP World
+      - AD Ports
+      - Abu Dhabi Ports
+      - Etihad Rail
+      - Salik
+      - Parkin
+      - RTA
+      - Aramex
+      - Agility
+      - Almarai
+      # Aviation
+      - Emirates
+      - Etihad
+      - flydubai
+      - Air Arabia
+      - Qatar Airways
+      - Saudia
+      - Riyadh Air
+      - Gulf Air
+      - Oman Air
+      - Kuwait Airways
+      - GACA
+      - Dnata
+      # Banks, exchanges, finance
+      - FAB
+      - First Abu Dhabi Bank
+      - Emirates NBD
+      - ADCB
+      - ADIB
+      - Mashreq
+      - QNB
+      - QIB
+      - Al Rajhi
+      - SNB
+      - Saudi National Bank
+      - NBK
+      - Tadawul
+      - Saudi Exchange
+      - ADX
+      - DFM
+      - Nasdaq Dubai
+      - QSE
+      - Boursa Kuwait
+      - Argaam
+      - Tabby
+      - Tamara
+      - Wio
+      # Real estate and giga-projects
+      - Emaar
+      - Aldar
+      - Damac
+      - Nakheel
+      - Sobha
+      - Majid Al Futtaim
+      - Red Sea Global
+      - NEOM
+      - Qiddiya
+      - Diriyah
+      - Roshn
+      - AlUla
+      - Amaala
+      - Qatari Diar
+      - Barwa
+      - Msheireb
+      - Modon
+      - Wynn Al Marjan
+      # Telecom, consumer, platforms
+      - stc
+      - e&
+      - Etisalat
+      - Ooredoo
+      - Zain
+      - Batelco
+      - Omantel
+      - Careem
+      - Talabat
+      - Noon
+      - Kitopi
+      - Swvl
+      - Property Finder
+      - Anghami
+      - Chalhoub
+      - Lulu
+      - Landmark Group
+      # Free zones, regulators, institutions
+      - DIFC
+      - DMCC
+      - ADGM
+      - JAFZA
+      - KIZAD
+      - Masdar City
+      - SAGIA
+      - Invest Saudi
+      - Monshaat
+      - ADNEC
+      - Expo City
+      # Sport, entertainment, events as investment vehicles
+      - LIV Golf
+      - Savvy Games
+      - Surj Sports
+      - Qiddiya Investment
+      - SELA
+      - FII
+      - Future Investment Initiative
+      - Investopia
+      - Milken
+      - World Economic Forum
+      - Web Summit
+      - GITEX
+      - LEAP
+
+  # ── Named principals ───────────────────────────────────────────────────────
+  # The Gulf elite network is a Circuit beat in its own right — the Tahnoun photograph,
+  # the Budapest huddle, the World Cup final box, the Macron manga theme park. Those
+  # stories carry no business vocabulary at all and would otherwise be invisible.
+  - name: principal
+    points: 3
+    terms:
+      - MBS
+      - Mohammed bin Salman
+      - MBZ
+      - Mohamed bin Zayed
+      - Mohammed bin Zayed
+      - Sheikh Tahnoun
+      - Sheikh Tahnoon
+      - Tahnoun bin Zayed
+      - Sheikh Mansour
+      - Sheikh Khaled
+      - Mohammed bin Rashid
+      - Sheikh Hamdan
+      - Al-Rumayyan
+      - Yasir Al-Rumayyan
+      - Khaldoon
+      - Al Mubarak
+      - Alabbar
+      - Mohamed Alabbar
+      - Amin Nasser
+      - Al Jaber
+      - Sultan Al Jaber
+      - Abdulaziz bin Salman
+      - Bin Sulayem
+      - Sheikh Tamim
+      - Sheikh Hamad
+      - Emir
+      - Emir of Qatar
+      - crown prince
+      - energy minister
+      - finance minister
+      - central bank governor
+      - sovereign fund chief
+
+  # ── Geography ──────────────────────────────────────────────────────────────
+  # Two points on purpose. Below the threshold, so a country name alone never admits a
+  # story: this is the axis that stops "Saudi Arabia arrests cleric" and every Egyptian
+  # election story from arriving in the channel.
+  - name: geography
+    points: 2
+    terms:
+      - UAE
+      - Emirates
+      - Emirati
+      - Abu Dhabi
+      - Dubai
+      - Sharjah
+      - Ajman
+      - Ras Al Khaimah
+      - Fujairah
+      - Umm Al Quwain
+      - Saudi
+      - Saudi Arabia
+      - Riyadh
+      - Jeddah
+      - Dammam
+      - Qatar
+      - Qatari
+      - Doha
+      - Kuwait
+      - Kuwaiti
+      - Bahrain
+      - Manama
+      - Oman
+      - Omani
+      - Muscat
+      - GCC
+      - Gulf
+      - Middle East
+      - Mideast
+      - MENA
+      - EMEA
+      - Egypt
+      - Egyptian
+      - Cairo
+      - Jordan
+      - Morocco
+      - Iraq
+      - Iraqi
+      - Syria
+      - Syrian
+      - Lebanon
+      - Turkey
+      - Türkiye
+
+  # ── Sector: business, ventures, technology, science ────────────────────────
+  # The axis that makes geography mean something. Deliberately broad — it is the half of
+  # the pair that says "this is a business story", and a missing word here is how a real
+  # Circuit story gets missed. Every term below the deals block was added because a real
+  # headline in tests/headlines.txt needed it.
+  - name: sector
+    points: 2
+    terms:
+      # Deals and capital markets
+      - acquisition
+      - acquire
+      - acquires
+      - acquired
+      - buy
+      - buys
+      - buyout
+      - purchase
+      - takeover
+      - merger
+      - stake
+      - shares
+      - shareholder
+      - IPO
+      - listing
+      - list
+      - delisting
+      - flotation
+      - divest
+      - divestment
+      - sell-off
+      - joint venture
+      - partnership
+      - partners
+      - memorandum
+      - MoU
+      - funding
+      - funding round
+      - raises
+      - raised
+      - fundraising
+      - valuation
+      - valued
+      - unicorn
+      - exit
+      - bid
+      - bids
+      - tender
+      - contract
+      - awarded
+      - deal
+      - agreement
+      - investment
+      - invests
+      - investor
+      - investors
+      - fund
+      - portfolio
+      - assets under management
+      - AUM
+      # Company and market operations
+      - revenue
+      - profit
+      - profits
+      - earnings
+      - loss
+      - losses
+      - quarterly
+      - results
+      - guidance
+      - dividend
+      - rights issue
+      - loan
+      - loans
+      - financing
+      - refinancing
+      - bond
+      - bonds
+      - sukuk
+      - debt
+      - credit
+      - rating
+      - downgrade
+      - upgrade
+      - default
+      - restructuring
+      - bankruptcy
+      - liquidity
+      - market
+      - markets
+      - stocks
+      - index
+      - bourse
+      - company
+      - companies
+      - business
+      - businesses
+      - startup
+      - startups
+      - venture
+      - ventures
+      - fintech
+      - bank
+      - banks
+      - banking
+      - banker
+      - bankers
+      - wealth management
+      - money transfers
+      - prices
+      - insurance
+      - insurer
+      - reinsurance
+      - hires
+      - hiring
+      - appoints
+      - names
+      - CEO
+      - chairman
+      - board
+      - shakeup
+      - expansion
+      - expands
+      - launches
+      - opens
+      - targets
+      - weighs
+      - explores
+      - plans
+      # Fiscal, monetary, regulatory
+      - budget
+      - deficit
+      - surplus
+      - economy
+      - economic
+      - GDP
+      - inflation
+      - interest rates
+      - currency
+      - dirham
+      - riyal
+      - dinar
+      - swap
+      - reserves
+      - trade
+      - exports
+      - imports
+      - tariff
+      - tariffs
+      - tax
+      - taxation
+      - VAT
+      - royalty
+      - subsidy
+      - subsidize
+      - regulator
+      - regulation
+      - rules
+      - licence
+      - license
+      - permit
+      - fine
+      - fines
+      - penalty
+      - sanctions
+      - sanctioned
+      - blacklist
+      - money laundering
+      - free zone
+      - headquarters
+      - HQ
+      - residency
+      - visa reform
+      # Energy
+      - oil
+      - crude
+      - gas
+      - LNG
+      - LPG
+      - petrochemical
+      - refinery
+      - refining
+      - pipeline
+      - OPEC
+      - barrel
+      - barrels
+      - output
+      - production
+      - drilling
+      - exploration
+      - upstream
+      - downstream
+      - hydrogen
+      - ammonia
+      - solar
+      - renewable
+      - renewables
+      - nuclear
+      - grid
+      - power plant
+      - utility
+      - electricity
+      - desalination
+      - water
+      - carbon
+      - emissions
+      - fuel
+      - petrol
+      - diesel
+      # Shipping, logistics, infrastructure
+      - tanker
+      - tankers
+      - shipping
+      - vessel
+      - vessels
+      - ships
+      - fleet
+      - freight
+      - cargo
+      - port
+      - ports
+      - terminal
+      - logistics
+      - supply chain
+      - warehouse
+      - corridor
+      - rail
+      - railway
+      - metro
+      - highway
+      - bridge
+      - undersea cable
+      - cable
+      - construction
+      - contractor
+      - infrastructure
+      - project
+      - projects
+      - factory
+      - plant
+      - refit
+      - hub
+      - facility
+      - build
+      - builds
+      - building
+      # Technology and science
+      - technology
+      - technologies
+      - artificial intelligence
+      - AI
+      - machine learning
+      - chip
+      - chips
+      - semiconductor
+      - Nvidia
+      - data center
+      - data centre
+      - cloud
+      - software
+      - platform
+      - app
+      - digital
+      - cyber
+      - cybersecurity
+      - crypto
+      - cryptocurrency
+      - blockchain
+      - digital assets
+      - stablecoin
+      - tokenization
+      - satellite
+      - space
+      - spaceport
+      - rocket
+      - biotech
+      - pharmaceutical
+      - genomics
+      - research
+      - science
+      - scientists
+      - laboratory
+      - patent
+      - quantum
+      - robotics
+      - drone
+      - drones
+      - electric vehicle
+      - EV
+      - battery
+      - gaming
+      - esports
+      - streaming
+      # Property, hospitality, consumer
+      - real estate
+      - property
+      - properties
+      - developer
+      - development
+      - residential
+      - commercial
+      - office
+      - mall
+      - retail
+      - sales
+      - tourism
+      - tourist
+      - hotel
+      - hotels
+      - resort
+      - hospitality
+      - restaurant
+      - airline
+      - aviation
+      - airport
+      - flights
+      - route
+      - routes
+      - aircraft
+      - jet
+      - jets
+      - Boeing
+      - Airbus
+      - Dreamliner
+      - delivery
+      - taxi
+      - ride-hailing
+      - mining
+      - minerals
+      - copper
+      - gold mining
+      - aluminium
+      - aluminum
+      - steel
+      - agriculture
+      - food security
+      - wheat
+      - fisheries
+      - healthcare
+      - hospital
+      - insurance premium
+      - education institutions
+      - theme park
+      - casino
+      - stadium
+      - sponsorship
+
+  # ── Conflict economics ─────────────────────────────────────────────────────
+  # Hormuz appears in 24 of 269 Circuit headlines. This is not war coverage — it is the
+  # economics of a chokepoint: rerouting, war-risk premiums, closed airspace, insurers
+  # threatening to cancel. Weighted like an entity because on this beat it is one.
+  - name: conflict_econ
+    points: 3
+    terms:
+      - Hormuz
+      - Strait of Hormuz
+      - Red Sea
+      - Bab el-Mandeb
+      - Suez
+      - blockade
+      - chokepoint
+      - reroute
+      - rerouting
+      - detour
+      - war risk
+      - war-risk
+      - war insurance
+      - insurance costs
+      - premiums
+      - airspace
+      - canceled flights
+      - cancelled flights
+      - flight suspensions
+      - supply disruption
+      - disruption
+      - disruptions
+      - shortage
+      - evacuation
+      - force majeure
+      - ceasefire
+      - Iran conflict
+      - Iran war
+      - missile attack
+      - drone attack
+      - strikes
+
+# ── Noise vetoes ────────────────────────────────────────────────────────────
+# Dropped regardless of score, matched against the headline only. Every one of these is
+# something the Gulf consumer press publishes daily and Circuit has never once written:
+# service journalism, sport, celebrity, gold rates. This list exists because a mixed
+# tabloid corpus passed 15% on score alone, and almost all of it was this.
+noise:
+  - prayer times
+  - gold rate
+  - gold rates
+  - gold prices
+  - horoscope
+  - weather warning
+  - rain alert
+  - temperatures
+  - traffic accident
+  - road accident
+  - back-to-school
+  - school reopen
+  - students
+  - uniform
+  - raffle
+  - lottery
+  - big ticket
+  - duty free draw
+  - recipe
+  - restaurant review
+  - things to do
+  - what to know
+  - match preview
+  - transfer window
+  - kick-off
+  - live score
+  - full-time
+  - Premier League
+  - World Cup qualifier
+  - box office
+  - Bollywood
+  - trailer out
+  - viral
+  - influencer
+  - fashion week
+  - horoscope today
+  - public holiday
+  - parking
+  - fine amnesty
+  - visa amnesty
+  - deported
+  - arrested
+  - jailed
+  - sentenced
+  - court fines
+  - murder
+  - assault
+  - prediction
+  - predictions
+  - head-to-head
+  - booking code
+  - Pro League
+  - vs
+  - line-up
+  - lineup
+  - fixture
+  - fixtures
+  # State-wire puffery. WAM and SPA file a steady stream of ministers "affirming" and
+  # "underscoring" things; none of it is a story, and all of it scores geography+sector.
+  - showcases
+  - highlights UAE
+  - affirms
+  - reaffirms
+  - underscores
+  - stresses importance
+  - honours
+  - patronage
+  - receives delegation
+  - meets with delegation
+  - participates in
+  - concludes participation
+  - Society on
+  - Congress of
+  - symposium
+  - workshop
+  - seminar
+  - awareness campaign
+  - ceremony
+  - jobs in
+  - vacancy
+  - vacancies
+  - live football
+  - watch live
+  - full match
+  - streaming live
+  - years of experience
+  - now hiring
+  - apply now
+  - what we know
+  - should know
+  - motorists
+  - traffic fines
+  - back to school
+  - academic year
+  - school transport
+  - admissions
+  - professors
+  - Miss Universe
+  - crowned
+  - operational reasons
+  - things to know
+
+# ── Digest sections ─────────────────────────────────────────────────────────
+# Which part of the message a story lands in, decided by the story rather than by its
+# source — the same outlet files a data-center deal and a tanker rerouting. Checked in
+# order: energy, then tech, then wider-MENA-with-no-Gulf-state, else Gulf business.
+categories:
+  energy:
+    [oil, crude, gas, LNG, OPEC, refinery, pipeline, barrel, barrels, hydrogen, solar,
+     renewable, nuclear, power plant, electricity, grid, desalination, tanker, tankers,
+     shipping, vessel, vessels, freight, cargo, port, ports, terminal, logistics,
+     Hormuz, Red Sea, Suez, reroute, rerouting, war risk, ADNOC, Aramco, QatarEnergy,
+     Masdar, ACWA Power, TAQA, DP World, AD Ports, XRG, Borouge, Fertiglobe]
+  tech:
+    [artificial intelligence, AI, chip, chips, semiconductor, Nvidia, data center,
+     data centre, cloud, software, platform, digital, cyber, cybersecurity, crypto,
+     blockchain, digital assets, satellite, space, spaceport, biotech, genomics,
+     research, science, quantum, robotics, drone, drones, startup, startups, fintech,
+     gaming, esports, MGX, G42, Core42, Space42, Presight, Humain, Careem, Talabat]
+  wider_mena:
+    [Egypt, Egyptian, Cairo, Jordan, Morocco, Iraq, Iraqi, Syria, Syrian, Lebanon,
+     Turkey, Türkiye]
+  gcc:
+    [UAE, Emirates, Emirati, Abu Dhabi, Dubai, Sharjah, Saudi, Riyadh, Jeddah, Qatar,
+     Qatari, Doha, Kuwait, Kuwaiti, Bahrain, Oman, Omani, Muscat, GCC, Gulf]
+
+# ── Byline bypass ───────────────────────────────────────────────────────────
+# Reporters whose every piece is worth seeing regardless of score. Requires the source
+# feed to expose an author (dc:creator or <author>) — many don't. Empty until named.
+byline_bypass: []

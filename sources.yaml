@@ -1,0 +1,287 @@
+# Sources the newswire polls each run. Data, not logic — poll.py re-reads this file
+# every run, so an edit takes effect on the next tick.
+#
+# The list is not a guess about who covers the Gulf. It is drawn from The Circuit's own
+# footnotes: every outbound link in 300 of their posts was counted, and the outlets they
+# actually rely on, in their own original stories, are Bloomberg (68 links), Reuters (28),
+# The National (24), AGBI (19), FT (11), Zawya (11), Arab News (9), WSJ (7), NYT (5) and
+# WAM (4). Eleven outlets that looked plausible on trade-press instinct — OilPrice,
+# Splash247, Offshore Energy, PV Magazine, Al-Monitor, Middle East Monitor, Al Jazeera,
+# Wamda, Globes, Calcalist, Times of Israel — were cited zero times between them across
+# those 300 posts and are deliberately absent.
+#
+# Per-source fields:
+#   key             short unique id; the dedup + status label
+#   outlet          how it appears in Slack
+#   desk            optional parenthetical after the outlet ("Business", "Markets")
+#   method          rss | gnews | gnews_entity
+#   url             rss: the feed. gnews: the domain (optionally domain/path) to scope to.
+#   query           gnews: extra terms ANDed into the site: search.
+#                   gnews_entity: the whole query, NOT restricted to any site.
+#   publisher       gnews: accepted publisher names. Google honours site: loosely and
+#                   will return other domains; anything not matching is dropped.
+#   threshold       score needed from this source. Lower for outlets that are all
+#                   on-beat; higher for general wires and consumer papers.
+#   window_minutes  freshness window. Must exceed the 15-minute dispatch interval, or
+#                   stories fall between runs and capped items expire before the next.
+#   paywall         adds "(paywall)" to the line — an internal reading aid, not copy.
+#   enabled         optional, defaults true
+#
+# Feed status below was verified live on 2026-08-26. Re-run `poll.py --audit` monthly:
+# a dead feed answers HTTP 200 and serves a web page, so nothing else will ever notice.
+
+max_items: 20
+
+sources:
+
+  # ══ Tier 1 — the outlets Circuit actually sources from ═══════════════════════
+
+  # Their single biggest source (68 links in original stories). No usable native feed
+  # for Gulf coverage, so site-scoped Google News: 92 items in a 2-day window when
+  # tested. High threshold — the query is broad and Bloomberg files on everything.
+  - key: bloomberg
+    outlet: Bloomberg
+    method: gnews
+    url: bloomberg.com
+    query: "(Gulf OR Saudi OR UAE OR Qatar OR Kuwait OR Aramco OR ADNOC OR PIF OR Mubadala)"
+    publisher: [Bloomberg]
+    threshold: 6
+    window_minutes: 180
+
+  - key: reuters
+    outlet: Reuters
+    method: gnews
+    url: reuters.com
+    query: "(Gulf OR Saudi OR UAE OR Qatar OR Kuwait OR Oman OR Bahrain OR Aramco OR ADNOC)"
+    publisher: [Reuters]
+    threshold: 6
+    window_minutes: 180
+
+  # Native, fresh within the hour when tested. The business desk specifically — the
+  # general feed carries UAE lifestyle and service journalism.
+  - key: thenational
+    outlet: The National
+    desk: Business
+    method: rss
+    url: "https://www.thenationalnews.com/arc/outboundfeeds/rss/category/business/?outputType=xml"
+    threshold: 4
+    window_minutes: 45
+
+  # The purest on-beat feed in the list: Gulf business only, nothing else. Lowest
+  # threshold, so a bare "Dubai" or "PIF" story clears.
+  - key: agbi
+    outlet: AGBI
+    method: rss
+    url: "https://www.agbi.com/feed/"
+    threshold: 3
+    window_minutes: 45
+
+  - key: ft
+    outlet: FT
+    desk: Middle East
+    method: rss
+    url: "https://www.ft.com/middle-east?format=rss"
+    threshold: 4
+    window_minutes: 60
+    paywall: true
+
+  # Aggregator of Gulf corporate and market news; Circuit leans on it heavily for the
+  # Daily Circuit roundup (432 links). No native feed — every documented path serves HTML.
+  - key: zawya
+    outlet: Zawya
+    method: gnews
+    url: zawya.com
+    publisher: [Zawya]
+    threshold: 3
+    window_minutes: 180
+
+  # Native rss.xml answers HTTP 200 with items SIXTEEN DAYS stale — the exact trap this
+  # project is built to notice. Google News instead.
+  - key: arabnews
+    outlet: Arab News
+    method: gnews
+    url: arabnews.com
+    query: "(business OR economy OR investment OR energy OR PIF OR Aramco)"
+    publisher: [Arab News]
+    threshold: 5
+    window_minutes: 180
+
+  - key: wsj
+    outlet: WSJ
+    method: gnews
+    url: wsj.com
+    query: "(Gulf OR Saudi OR UAE OR Qatar OR Aramco OR sovereign wealth)"
+    publisher: [WSJ, The Wall Street Journal, Wall Street Journal]
+    threshold: 6
+    window_minutes: 180
+    paywall: true
+
+  - key: nyt
+    outlet: NYT
+    method: gnews
+    url: nytimes.com
+    query: "(Gulf OR Saudi OR UAE OR Qatar OR Aramco OR sovereign wealth fund)"
+    publisher: [The New York Times, New York Times]
+    threshold: 6
+    window_minutes: 180
+    paywall: true
+
+  # The Emirati state wire. Serves HTML at every feed path; 77 items/day via Google News.
+  # Worth having despite being a government mouthpiece: it is where UAE deals are
+  # announced first, and Circuit cites it 288 times.
+  - key: wam
+    outlet: WAM
+    desk: UAE state wire
+    method: gnews
+    url: wam.ae
+    publisher: [WAM, Emirates News Agency, "وكالة وام"]
+    threshold: 5
+    window_minutes: 180
+
+  # ══ Tier 2 — Gulf trade and regional press ══════════════════════════════════
+
+  # 174 items a week, and a lot of it consumer-facing. Threshold does the work.
+  - key: arabianbusiness
+    outlet: Arabian Business
+    method: rss
+    url: "https://www.arabianbusiness.com/feed"
+    threshold: 5
+    window_minutes: 45
+
+  - key: forbesme
+    outlet: Forbes Middle East
+    method: rss
+    url: "https://www.forbesmiddleeast.com/feed/"
+    threshold: 4
+    window_minutes: 60
+
+  # Projects, contracts and tender awards — the closest thing to a primary source in
+  # tier 2, and where an infrastructure story shows up before the wires have it.
+  - key: meed
+    outlet: MEED
+    method: gnews
+    url: meed.com
+    publisher: [MEED]
+    threshold: 2
+    window_minutes: 240
+
+  - key: semafor
+    outlet: Semafor
+    desk: Gulf
+    method: gnews
+    url: semafor.com
+    query: "(Gulf OR Saudi OR UAE OR Qatar)"
+    publisher: [Semafor]
+    threshold: 5
+    window_minutes: 240
+
+  # Saudi financial-market coverage: disclosures, results, Tadawul filings. Every native
+  # feed path serves an HTML page or 403s (checked 2026-08-26), so Google News it is.
+  - key: argaam
+    outlet: Argaam
+    method: gnews
+    url: argaam.com
+    publisher: [Argaam, "ارقام"]
+    threshold: 6
+    window_minutes: 180
+
+  - key: spa
+    outlet: SPA
+    desk: Saudi state wire
+    method: gnews
+    url: spa.gov.sa
+    query: "(investment OR economy OR energy OR agreement OR fund)"
+    publisher: [SPA, Saudi Press Agency, "وكالة الأنباء السعودية"]
+    threshold: 5
+    window_minutes: 240
+
+  # The two Gulf consumer dailies. Business-scoped queries and a high threshold: unscoped,
+  # both flood the channel with gold rates, traffic fines and back-to-school features —
+  # measured at a 15% pass rate on score alone before the noise vetoes went in.
+  - key: khaleejtimes
+    outlet: Khaleej Times
+    method: gnews
+    url: khaleejtimes.com
+    query: "(business OR economy OR investment OR markets OR energy)"
+    publisher: [Khaleej Times]
+    threshold: 6
+    window_minutes: 180
+
+  - key: gulfnews
+    outlet: Gulf News
+    method: gnews
+    url: gulfnews.com
+    query: "(business OR economy OR investment OR markets OR energy)"
+    publisher: [Gulf News]
+    threshold: 6
+    window_minutes: 180
+
+  - key: intelligenceonline
+    outlet: Intelligence Online
+    method: rss
+    url: "http://feeds.feedburner.com/IntelligenceOnline"
+    threshold: 4
+    window_minutes: 240
+    paywall: true
+
+  - key: peninsula
+    outlet: The Peninsula
+    desk: Qatar
+    method: gnews
+    url: thepeninsulaqatar.com
+    query: "(business OR economy OR investment OR energy OR QIA)"
+    publisher: [The Peninsula]
+    threshold: 5
+    window_minutes: 240
+
+  # Enterprise (Egypt) is deliberately absent: Google News returns zero entries for
+  # site:enterprise.press, with or without added terms, and the site has no usable feed.
+  # There is no discovery path, so listing it would mean a source that contributes
+  # nothing and never says so. Revisit if they publish a feed.
+
+  # ══ Entity queries — the actors, wherever they surface ══════════════════════
+  # Not publications. These catch a fund or a national champion in any outlet, including
+  # ones not on the list, which is how a PIF stake shows up when the Gulf press hasn't
+  # written it yet. Publisher is unrestricted here by design.
+
+  - key: q_sovereign_funds
+    outlet: Sovereign funds
+    method: gnews_entity
+    query: '("Public Investment Fund" OR Mubadala OR ADIA OR ADQ OR "Qatar Investment Authority" OR MGX OR Lunate OR Sanabil)'
+    threshold: 4
+    window_minutes: 240
+
+  - key: q_energy_champions
+    outlet: Energy champions
+    method: gnews_entity
+    query: "(ADNOC OR Aramco OR QatarEnergy OR Masdar OR \"ACWA Power\" OR TAQA OR Ma'aden OR SABIC)"
+    threshold: 4
+    window_minutes: 240
+
+  - key: q_ports_logistics
+    outlet: Ports & logistics
+    method: gnews_entity
+    query: '("DP World" OR "AD Ports" OR "Etihad Rail" OR Nakilat OR "Abu Dhabi Ports" OR Aramex)'
+    threshold: 4
+    window_minutes: 240
+
+  - key: q_giga_projects
+    outlet: Giga-projects
+    method: gnews_entity
+    query: '(NEOM OR Qiddiya OR Diriyah OR "Red Sea Global" OR Roshn OR AlUla OR "Qatari Diar")'
+    threshold: 4
+    window_minutes: 240
+
+  - key: q_gulf_tech
+    outlet: Gulf tech
+    method: gnews_entity
+    query: '(G42 OR Core42 OR Space42 OR Presight OR Humain OR "stc Group" OR Careem OR Talabat)'
+    threshold: 4
+    window_minutes: 240
+
+  - key: q_hormuz
+    outlet: Hormuz & shipping
+    method: gnews_entity
+    query: '("Strait of Hormuz" OR "war risk insurance" OR "Gulf shipping" OR "Red Sea shipping")'
+    threshold: 4
+    window_minutes: 240
