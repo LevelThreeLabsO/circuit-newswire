@@ -208,6 +208,25 @@ def run(args) -> int:
               f"{len(scored) - len(unseen)} already-posted item(s)")
     else:
         unseen = [i for i in scored if not dedup.already_posted(i, seen)]
+
+    # Within-run dedup. Gate 4 above compares against saved state; it cannot catch the
+    # same story arriving twice in ONE run, which happens whenever two queries cover the
+    # same outlet — a site-scoped NYT query and an entity query that NYT also matched
+    # return the same article under different Google redirect URLs, so the URL hashes
+    # differ while the headline hash is identical. That posted "LIV Golf plans mass
+    # layoffs" twice in a single digest. Keys are only claimed after the digest is built,
+    # so nothing earlier in the pipeline notices.
+    deduped: list[Item] = []
+    run_keys: set[str] = set()
+    for item in unseen:
+        keys = dedup.keys_for(item)
+        if any(k in run_keys for k in keys):
+            continue
+        run_keys.update(keys)
+        deduped.append(item)
+    if len(deduped) < len(unseen):
+        print(f"  dropped {len(unseen) - len(deduped)} duplicate(s) within this run")
+    unseen = deduped
     run_status.gate("unseen", len(unseen))
 
     # ---- gate 5: not the same story another outlet just filed -------------
