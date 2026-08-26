@@ -147,13 +147,20 @@ def parse_feed(body: bytes):
     otherwise would flag half the Gulf financial press as broken.
     """
     parsed = feedparser.parse(body)
-    if not parsed.entries:
-        detail = str(getattr(parsed, "bozo_exception", "") or "no entries")
-        head = body[:400].decode("utf-8", "replace").lower()
-        if "<html" in head:
-            detail = f"served an HTML page, not a feed ({detail})"
-        raise ParseFailure(detail)
-    return parsed
+    # An empty feed is not a broken feed. feedparser sets `version` whenever it
+    # recognised the document as RSS/Atom, so a valid-but-empty result means the source
+    # published nothing in the queried window — Semafor going 33 hours between stories
+    # made its 1-day Google query return zero entries, which was being reported as a
+    # parse failure. That is both a false alarm and a corruption of the dead-source
+    # streak counter, whose whole job is to distinguish these two cases.
+    if parsed.entries or getattr(parsed, "version", ""):
+        return parsed
+
+    detail = str(getattr(parsed, "bozo_exception", "") or "no entries and no feed type")
+    head = body[:400].decode("utf-8", "replace").lower()
+    if "<html" in head:
+        detail = f"served an HTML page, not a feed ({detail})"
+    raise ParseFailure(detail)
 
 
 # --------------------------------------------------------------------- gnews bits
