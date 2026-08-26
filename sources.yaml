@@ -32,16 +32,17 @@
 
 max_items: 20
 
-# Publish-age cap. An item posts if we have not seen it before AND it was published
-# within this many minutes. Dedup does the novelty work; this only stops genuinely old
-# news being dredged up.
+# Publish-age cap: an item posts if we have not seen it before AND it was published
+# within this many minutes. Dedup does the novelty work; this stops old news being
+# dredged up.
 #
-# 240 minutes is chosen to absorb indexing lag, not publication gaps. A story published
-# at 14:00 that Google News only lists at 14:50 still posts, labelled "50m ago" — with a
-# tighter cap it would be dropped and never seen, which is a silent miss. The visible
-# cost is that a late-indexed item can read as a couple of hours old; that timestamp is
-# accurate, and the alternative is not seeing the story at all.
-default_window_minutes: 240
+# 30 minutes, matching the JI Newswire's approach (LOOKBACK_MINUTES: 20, "slightly more
+# than interval to avoid gaps") with a little more headroom for a 15-minute tick. The
+# tradeoff is deliberate and one-directional: a story Google News indexes more than half
+# an hour after publication is dropped and never seen. JI absorbs that loss across 70
+# sources; at 37 it is more noticeable. Raise this if the channel feels thin — 240 was
+# the previous setting and misses nothing, at the cost of items reading a few hours old.
+default_window_minutes: 30
 
 sources:
 
