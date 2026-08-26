@@ -169,7 +169,24 @@ def run(args) -> int:
 
     # ---- gate 4: not already posted ---------------------------------------
     seen = live_state["seen"]
-    unseen = [i for i in scored if not dedup.already_posted(i, seen)]
+    if args.backfill:
+        # Release what a baseline swallowed. A first run claims everything currently in
+        # the feeds so the channel doesn't get a backlog dump — but afterwards "claimed"
+        # is indistinguishable from "posted", so a re-baseline (or a first run on a busy
+        # morning) silently buries real coverage. Backfill ignores the claim store for one
+        # run and skips only what we can prove was posted: the remembered headlines of
+        # past digests, matched near-identically.
+        posted_words = [t.get("words", []) for t in live_state["titles"]]
+
+        def already_shown(item: Item) -> bool:
+            words = dedup.title_words(item.title)
+            return any(dedup.overlap(words, w) >= 0.8 for w in posted_words)
+
+        unseen = [i for i in scored if not already_shown(i)]
+        print(f"  backfill: claim store ignored; skipped "
+              f"{len(scored) - len(unseen)} already-posted item(s)")
+    else:
+        unseen = [i for i in scored if not dedup.already_posted(i, seen)]
     run_status.gate("unseen", len(unseen))
 
     # ---- gate 5: not the same story another outlet just filed -------------
@@ -302,6 +319,8 @@ def main() -> int:
     p.add_argument("--window-hours", type=float, default=None, help="override every source's window")
     p.add_argument("--source", action="append", help="limit to source key(s); repeatable")
     p.add_argument("--max-items", type=int, default=None, help="override the digest cap")
+    p.add_argument("--backfill", action="store_true",
+                   help="post what a baseline claimed but never showed (see gate 4)")
     p.add_argument("--status", action="store_true", help="print status.json and exit")
     p.add_argument("--score", metavar="HEADLINE", help="score one headline and exit")
     p.add_argument("--test-webhook", action="store_true", help="post a test message and exit")

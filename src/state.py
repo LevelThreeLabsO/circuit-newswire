@@ -209,11 +209,26 @@ def latest() -> dict:
 
 
 def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.json")) -> None:
-    """Persist locally and, inside a git repo, commit + push. Retries on a concurrent
-    push race by re-merging against the new origin."""
+    """Persist locally and, inside a git repo, commit + push the two state files.
+
+    Retries on a concurrent-push race by re-merging against the new origin.
+
+    **Never touches anything but those two files.** An earlier version ran
+    `git reset --hard origin/main` before committing: harmless on a fresh Actions
+    checkout, destructive anywhere else. Run locally it silently deleted uncommitted work
+    in the repo — it ate the feature that was being written at the time. A background job
+    able to revert its owner's working tree is a far worse failure than a lost state
+    merge, so losing the race is now handled by rewinding our own commit and moving the
+    branch pointer, leaving the index and working tree alone.
+    """
     save(state)
     if not _is_git_repo():
         return
+
+    dirty = _dirty_other_than(files)
+    if dirty:
+        print(f"  note: leaving uncommitted changes alone: {', '.join(dirty[:4])}")
+
     for _ in range(5):
         _git("fetch", "-q", "origin", "main")
         remote = _git("show", "origin/main:watcher_state.json")
@@ -223,17 +238,23 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
                 merged = merge(state, _coerce(json.loads(remote.stdout)))
             except Exception:
                 pass
-        # Keep our status.json across the reset — it describes the run that just happened.
-        status_path = REPO / "status.json"
-        status_body = status_path.read_text() if status_path.exists() else None
-        _git("reset", "-q", "--hard", "origin/main")
         save(merged)
-        if status_body is not None:
-            status_path.write_text(status_body)
         _git("add", *files)
         if _git("diff", "--cached", "--quiet").returncode == 0:
-            return
+            return  # origin already has everything we do
         _git(*GIT_ID, "commit", "-q", "-m", "Update newswire state [skip ci]")
         if _git("push", "-q", "origin", "HEAD:main").returncode == 0:
             return
-        # Lost the race — loop and re-merge against the updated origin.
+        # Lost the race. Undo our commit but keep the files, then point the branch at the
+        # new origin without disturbing the tree, and re-merge on the next pass.
+        _git("reset", "-q", "--soft", "HEAD~1")
+        _git("update-ref", "refs/heads/main", "origin/main")
+
+
+def _dirty_other_than(files: tuple[str, ...]) -> list[str]:
+    """Uncommitted paths other than the state files — for logging, never for acting on."""
+    r = _git("status", "--porcelain")
+    if r.returncode != 0:
+        return []
+    return [p for p in (ln[3:].strip() for ln in r.stdout.splitlines())
+            if p and p not in files]
