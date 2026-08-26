@@ -32,17 +32,21 @@
 
 max_items: 20
 
-# How old a story may be and still be worth flagging. This is a STALENESS CEILING, not a
-# polling window, and the distinction was a real bug: per-source windows of 45-60 minutes
-# were set to "a bit more than the dispatch interval", which silently muted the best
-# sources. Measured on 2026-08-26, the newest item a source offers is a median of 123
-# minutes old for Google News and 228 for native feeds — AGBI's was 236, FT's 265. Against
-# a 45-minute window those outlets contribute nothing, forever, with no error.
+# How old a story may be and still be worth flagging: a staleness ceiling, not a polling
+# window. Dedup guarantees novelty, so this only decides how far back to look.
 #
-# Dedup already guarantees novelty, so a generous ceiling cannot cause reposts. It only
-# decides how far back a story can be and still be new *to us*. Six hours covers a Gulf
-# publishing gap and a Google indexing lag together, without dredging up yesterday.
-default_window_minutes: 360
+# Sized to cover the dispatch interval (15 min) plus indexing lag, and nothing more. An
+# earlier version used 360 minutes on the theory that sources publish slowly — measured
+# newest-item ages of 123 minutes on Google News and 228 on native feeds. That reasoning
+# was wrong: "AGBI's newest item is 236 minutes old" means AGBI had not published in four
+# hours, not that AGBI's items arrive four hours late. When a source publishes, the next
+# tick sees it. A wide ceiling therefore bought no coverage and admitted genuinely stale
+# news — items landing in the channel four hours after the fact.
+#
+# 120 minutes leaves room for Google News to index in bursts while keeping the channel a
+# reading of now. The cost is bounded and worth stating: an item Google indexes more than
+# two hours after publication is missed entirely.
+default_window_minutes: 120
 
 sources:
 
