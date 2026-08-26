@@ -32,21 +32,16 @@
 
 max_items: 20
 
-# How old a story may be and still be worth flagging: a staleness ceiling, not a polling
-# window. Dedup guarantees novelty, so this only decides how far back to look.
+# Publish-age cap. An item posts if we have not seen it before AND it was published
+# within this many minutes. Dedup does the novelty work; this only stops genuinely old
+# news being dredged up.
 #
-# Sized to cover the dispatch interval (15 min) plus indexing lag, and nothing more. An
-# earlier version used 360 minutes on the theory that sources publish slowly — measured
-# newest-item ages of 123 minutes on Google News and 228 on native feeds. That reasoning
-# was wrong: "AGBI's newest item is 236 minutes old" means AGBI had not published in four
-# hours, not that AGBI's items arrive four hours late. When a source publishes, the next
-# tick sees it. A wide ceiling therefore bought no coverage and admitted genuinely stale
-# news — items landing in the channel four hours after the fact.
-#
-# 120 minutes leaves room for Google News to index in bursts while keeping the channel a
-# reading of now. The cost is bounded and worth stating: an item Google indexes more than
-# two hours after publication is missed entirely.
-default_window_minutes: 45
+# 240 minutes is chosen to absorb indexing lag, not publication gaps. A story published
+# at 14:00 that Google News only lists at 14:50 still posts, labelled "50m ago" — with a
+# tighter cap it would be dropped and never seen, which is a silent miss. The visible
+# cost is that a late-indexed item can read as a couple of hours old; that timestamp is
+# accurate, and the alternative is not seeing the story at all.
+default_window_minutes: 240
 
 sources:
 
