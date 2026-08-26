@@ -376,3 +376,34 @@ sources:
     method: gnews_entity
     query: '("Kuwait Investment Authority" OR Wafra OR Mumtalakat OR "Oman Investment Authority" OR "Sovereign Fund of Egypt")'
     threshold: 4
+
+  # ══ Added on request; low yield, measured over 72 hours ═════════════════════
+  # Gulf Times 2 admitted items, Morocco World News 1, Ahram 0 of 80. Kept anyway
+  # because they cover Qatar and North African business that nothing else in the list
+  # does — but if the monthly audit shows them still at zero, they are dead weight.
+
+  - key: gulftimes
+    outlet: Gulf Times
+    desk: Qatar
+    method: gnews
+    url: gulf-times.com
+    query: "(business OR economy OR investment OR QIA OR energy)"
+    publisher: [Gulf Times]
+    threshold: 5
+
+  - key: moroccoworld
+    outlet: Morocco World News
+    method: gnews
+    url: moroccoworldnews.com
+    query: "(business OR economy OR investment OR finance OR energy)"
+    publisher: [Morocco World News]
+    threshold: 5
+
+  - key: ahram
+    outlet: Ahram Online
+    desk: Egypt
+    method: gnews
+    url: english.ahram.org.eg
+    query: "(business OR economy OR investment OR IMF OR energy OR Suez)"
+    publisher: [Ahram Online, Al-Ahram, Ahram]
+    threshold: 4

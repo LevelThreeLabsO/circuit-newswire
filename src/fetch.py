@@ -179,9 +179,10 @@ def _strip_publisher(title: str, publisher: str) -> str:
     """
     t = title.strip()
     t = re.sub(r"^\[\d{4}-\d{2}-\d{2}\]\s*", "", t)
-    if publisher and t.lower().endswith(f" - {publisher.lower()}"):
-        return t[: -(len(publisher) + 3)].strip()
-    return re.sub(r"\s+-\s+[^-]{3,40}$", "", t).strip()
+    for sep in (" - ", " | "):   # Google uses a dash; some outlets bake in a pipe
+        if publisher and t.lower().endswith(f"{sep}{publisher.lower()}"):
+            return t[: -(len(publisher) + len(sep))].strip()
+    return re.sub(r"\s+[-|]\s+[^-|]{3,40}$", "", t).strip()
 
 
 # The Circuit's own domain, excluded from every entity query at the query itself. A
