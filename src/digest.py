@@ -142,13 +142,14 @@ def build(items: list[Item], now: datetime, max_items: int = MAX_ITEMS,
     def sort_key(i: Item):
         return i.effective_date or i.published or now
 
-    ordered: list[Item] = []
-    for category in CATEGORY_ORDER:
-        group = [i for i in items if i.category == category]
-        ordered += sorted(group, key=sort_key, reverse=True)
-    ordered += sorted(
-        [i for i in items if i.category not in CATEGORY_ORDER], key=sort_key, reverse=True
-    )
+    # Strictly newest first, across every category.
+    #
+    # This used to group by category and sort within each group, which is how the JI
+    # original read. On this beat it actively misleads: a five-hour-old Gulf business item
+    # would sit above a fifteen-minute-old Hormuz story purely because of its section, so
+    # the digest looked stale even when it was leading with fresh news. The category label
+    # still travels on each line, so nothing is lost by ordering on recency alone.
+    ordered = sorted(items, key=sort_key, reverse=True)
 
     # Per-source cap, applied newest-first so a firehose keeps its freshest items.
     per_source: dict[str, int] = {}

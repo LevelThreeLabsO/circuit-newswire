@@ -75,7 +75,7 @@ def check_windows(sources: list[dict]) -> list[str]:
     """
     return [
         s["key"] for s in sources
-        if s.get("window_minutes", 25) <= DISPATCH_MINUTES
+        if s.get("window_minutes", 360) <= DISPATCH_MINUTES
     ]
 
 
@@ -86,6 +86,7 @@ def run(args) -> int:
 
     sources, config = load_sources(args.source)
     max_items = args.max_items or config.get("max_items", digest.MAX_ITEMS)
+    default_window = config.get("default_window_minutes", 360)
     now = now_utc()
     run_status = status.Run()
     slack = SlackClient()
@@ -103,7 +104,7 @@ def run(args) -> int:
 
     # ---- gate 1 + 2: fetch, within each source's own window -----------------
     candidates: list[Item] = []
-    for source, items, entries, exc in fetch_all(sources, now, args.window_hours):
+    for source, items, entries, exc in fetch_all(sources, now, args.window_hours, default_window):
         key = source["key"]
         if exc is not None:
             if isinstance(exc, ParseFailure):
@@ -137,7 +138,7 @@ def run(args) -> int:
     # ---- gate 2b: undated items age on when we first saw them --------------
     # Some feeds carry no timestamp at all. The freshness gate then never applies to
     # them and they stay eligible forever, reposting endlessly.
-    windows = {s["key"]: s.get("window_minutes", 25) for s in sources}
+    windows = {s["key"]: s.get("window_minutes", default_window) for s in sources}
     fresh: list[Item] = []
     for item in candidates:
         if item.published:

@@ -366,16 +366,18 @@ def _fetch_gnews(source: dict, since: datetime) -> tuple[list[Item], int]:
 _METHODS = {"rss": _fetch_rss, "gnews": _fetch_gnews, "gnews_entity": _fetch_gnews}
 
 
-def window_start(source: dict, now: datetime, override_hours: float | None = None) -> datetime:
-    """Freshness cutoff for one source.
+def window_start(source: dict, now: datetime, override_hours: float | None = None,
+                 default_minutes: int = DEFAULT_WINDOW_MINUTES) -> datetime:
+    """Staleness cutoff for one source: how old a story may be and still count as new.
 
-    Per-source windows matter more than they sound. The gate assumes a source publishes
-    to its feed the moment a story goes live; magazines and Google News-sourced feeds
-    lag hours, so a single tight window silently rejects everything they ever publish.
+    Not a polling window. Dedup decides novelty; this only decides how far back to look.
+    Sizing it like a polling window is a silent-failure generator — at 45 minutes, a
+    source whose freshest item is two hours old contributes nothing and never says so.
+    See the note on default_window_minutes in sources.yaml for the measured lags.
     """
     if override_hours:
         return now - timedelta(hours=override_hours)
-    minutes = source.get("window_minutes", DEFAULT_WINDOW_MINUTES)
+    minutes = source.get("window_minutes", default_minutes)
     return now - timedelta(minutes=minutes)
 
 
@@ -392,7 +394,8 @@ def fetch_source(source: dict, since: datetime) -> tuple[list[Item], int]:
     return [i for i in items if i.title and i.url], seen
 
 
-def fetch_all(sources: list[dict], now: datetime, override_hours: float | None = None):
+def fetch_all(sources: list[dict], now: datetime, override_hours: float | None = None,
+              default_minutes: int = DEFAULT_WINDOW_MINUTES):
     """Fetch every source concurrently. Yields (source, items, entries, exception).
 
     Threaded because a sequential pass over sixty feeds took the original four minutes,
@@ -400,7 +403,8 @@ def fetch_all(sources: list[dict], now: datetime, override_hours: float | None =
     """
     def one(source):
         try:
-            items, seen = fetch_source(source, window_start(source, now, override_hours))
+            items, seen = fetch_source(
+                source, window_start(source, now, override_hours, default_minutes))
             return source, items, seen, None
         except Exception as e:  # noqa: BLE001 — reported per source, never fatal
             return source, [], 0, e
