@@ -350,6 +350,11 @@ def _fetch_gnews(source: dict, since: datetime) -> tuple[list[Item], int]:
         publisher = _gnews_publisher(e)
         if not _publisher_matches(publisher, accept):
             continue  # Google leaked another domain into a site: query
+        # Entity queries are not publisher-restricted, which is how a Russian-language
+        # republisher ended up credited for a Saudi theme-park story. An English headline
+        # from a non-Latin masthead is a reprint, not the outlet that reported it.
+        if not accept and not is_english(publisher):
+            continue
         title = _strip_publisher(raw_title, publisher)
         if not title or not is_english(title) or looks_like_spam(title):
             continue
