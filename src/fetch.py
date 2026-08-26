@@ -202,6 +202,7 @@ PUBLISHER_BLOCKLIST = (
     "22bet", "1xbet", "betway", "bet365", "sportskeeda", "onefootball", "goal.com",
     "footballcritic", "soccerway", "flashscore", "sofascore", "betting", "tipster",
     "predictions", "fantasy football", "dream11", "today's golfer", "heavy.com",
+    "betpawa", "parimatch", "melbet", "stake.com", "oddspedia", "forebet",
     # User-generated and social platforms, which Google News indexes as publishers.
     "facebook", "instagram", "x.com", "twitter", "reddit", "youtube", "linkedin",
     "medium.com", "tiktok", "pinterest", "quora", "substack.com",
