@@ -285,3 +285,119 @@ sources:
     query: '("Strait of Hormuz" OR "war risk insurance" OR "Gulf shipping" OR "Red Sea shipping")'
     threshold: 4
     window_minutes: 240
+
+  # ══ Shipping & energy trade press ═══════════════════════════════════════════
+  # Added after measuring yield rather than citations. The citation test said cut this
+  # class — Splash247, Offshore Energy and OilPrice are cited zero times in 300 Circuit
+  # posts — but a 72-hour yield test says it is where the Hormuz story actually breaks:
+  # "Outbound Hormuz transits drop to zero" (Argus), "Marine insurers still providing
+  # charterers' war risk cover" (Lloyd's List), "Projectile disables oil tanker off Oman"
+  # (TradeWinds). Hormuz appears in 24 of Circuit's 269 story headlines. So the two facts
+  # together — they don't read this press, and this press breaks their biggest story —
+  # make it a coverage gap rather than a reason to exclude. These are the specific titles
+  # with verified yield; the zero-yield ones stay out.
+  #
+  # Threshold 5 on all of them: these are global trade outlets, so an item needs a Gulf
+  # anchor plus a sector signal, not just "tanker".
+
+  - key: tradewinds
+    outlet: TradeWinds
+    desk: Shipping
+    method: gnews
+    url: tradewindsnews.com
+    publisher: [TradeWinds]
+    threshold: 5
+    window_minutes: 240
+    paywall: true
+
+  - key: lloydslist
+    outlet: Lloyd's List
+    desk: Shipping
+    method: gnews
+    url: lloydslist.com
+    publisher: ["Lloyd's List"]
+    threshold: 5
+    window_minutes: 240
+    paywall: true
+
+  - key: argus
+    outlet: Argus Media
+    desk: Energy
+    method: gnews
+    url: argusmedia.com
+    publisher: [Argus Media]
+    threshold: 5
+    window_minutes: 240
+
+  - key: energyintel
+    outlet: Energy Intelligence
+    desk: Energy
+    method: gnews
+    url: energyintel.com
+    publisher: [Energy Intelligence]
+    threshold: 5
+    window_minutes: 240
+
+  - key: upstream
+    outlet: Upstream
+    desk: Oil & gas
+    method: gnews
+    url: upstreamonline.com
+    publisher: [Upstream]
+    threshold: 5
+    window_minutes: 240
+    paywall: true
+
+  - key: gcaptain
+    outlet: gCaptain
+    desk: Shipping
+    method: rss
+    url: "https://gcaptain.com/feed/"
+    threshold: 5
+    window_minutes: 60
+
+  - key: marineinsight
+    outlet: Marine Insight
+    desk: Shipping
+    method: rss
+    url: "https://www.marineinsight.com/feed/"
+    threshold: 5
+    window_minutes: 60
+
+  # ══ Additional Gulf press with verified yield ═══════════════════════════════
+
+  # Pan-Gulf business wire: contracts, projects, corporate announcements. No native feed.
+  - key: tradearabia
+    outlet: TradeArabia
+    method: gnews
+    url: tradearabia.com
+    publisher: [TradeArabia]
+    threshold: 5
+    window_minutes: 240
+
+  # Never cited by Circuit, but a live yield test put it among the strongest Saudi
+  # sources in the list. Threshold 6 because it is a general daily, not a business title.
+  - key: saudigazette
+    outlet: Saudi Gazette
+    method: rss
+    url: "https://saudigazette.com.sa/rssFeed/74"
+    threshold: 6
+    window_minutes: 60
+
+  # Capital-markets events: IPO filings, listings, rights issues, sukuk. Tested at 17
+  # admitted items in 72 hours, nearly all genuine exchange news.
+  - key: q_listings
+    outlet: IPOs & listings
+    method: gnews_entity
+    query: '((Tadawul OR ADX OR "Dubai Financial Market" OR "Saudi Exchange") (IPO OR listing OR "rights issue" OR sukuk))'
+    threshold: 4
+    window_minutes: 240
+
+  # The funds outside the big four — Kuwait, Bahrain, Oman, Egypt. Low volume by nature,
+  # but it caught Mumtalakat's McLaren acquisition in the test window.
+  - key: q_small_funds
+    outlet: Smaller sovereign funds
+    method: gnews_entity
+    query: '("Kuwait Investment Authority" OR Wafra OR Mumtalakat OR "Oman Investment Authority" OR "Sovereign Fund of Egypt")'
+    threshold: 4
+    window_minutes: 240

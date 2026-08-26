@@ -35,14 +35,15 @@ import yaml
 
 from src.fetch import (
     ParseFailure,
+    _aware,
+    _entry_date,
     _get,
     _gnews_publisher,
     _gnews_url,
     _publisher_matches,
+    build_query,
     now_utc,
     parse_feed,
-    _entry_date,
-    _aware,
 )
 
 SOURCES_FILE = Path(__file__).resolve().parent / "sources.yaml"
@@ -51,6 +52,7 @@ SOURCES_FILE = Path(__file__).resolve().parent / "sources.yaml"
 # MEED and the state wires legitimately go quiet over a Gulf weekend.
 STALE_HOURS = 96
 AUDIT_DAYS = 7      # how wide a window to ask Google News for while auditing
+LEAK_SHARE = 0.2    # share of wrong-publisher items that makes a site: query untrustworthy
 
 
 def audit_one(source: dict) -> dict:
@@ -59,13 +61,10 @@ def audit_one(source: dict) -> dict:
     try:
         if source["method"] == "rss":
             url = source["url"]
-        elif source["method"] == "gnews":
-            query = f"site:{source['url']}"
-            if source.get("query"):
-                query += f" {source['query']}"
-            url = _gnews_url(query, AUDIT_DAYS)
         else:
-            url = _gnews_url(source["query"], AUDIT_DAYS)
+            # Built by the same function the fetcher uses — see build_query's docstring.
+            query, _ = build_query(source)
+            url = _gnews_url(query, AUDIT_DAYS)
         response = _get(url)
     except Exception as e:  # noqa: BLE001 — the report is the product here
         out["verdict"] = "HTTP FAIL"
@@ -88,13 +87,17 @@ def audit_one(source: dict) -> dict:
     if source["method"] in ("gnews", "gnews_entity"):
         publishers = Counter(_gnews_publisher(e) or "?" for e in parsed.entries)
         out["publishers"] = publishers.most_common(3)
-        accept = source.get("publisher") or ([] if source["method"] == "gnews_entity" else [])
+        _, accept = build_query(source)
         if accept:
             wrong = sum(n for p, n in publishers.items() if not _publisher_matches(p, accept))
             out["leaked"] = wrong
-            if wrong:
+            share = wrong / max(1, len(parsed.entries))
+            # The fetcher drops these, so a stray one or two is normal. Flag only when
+            # Google has substantially ignored the site: restriction.
+            if share >= LEAK_SHARE:
                 out["verdict"] = "LEAKED"
-                out["detail"] = f"{wrong}/{len(parsed.entries)} items from other publishers"
+                out["detail"] = (f"{wrong}/{len(parsed.entries)} items from other "
+                                 f"publishers ({share:.0%})")
                 return out
 
     if not parsed.entries:

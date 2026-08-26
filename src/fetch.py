@@ -310,19 +310,31 @@ def _fetch_rss(source: dict, since: datetime) -> tuple[list[Item], int]:
     return items, len(parsed.entries)
 
 
-def _fetch_gnews(source: dict, since: datetime) -> tuple[list[Item], int]:
-    days = max(1, math.ceil((now_utc() - since).total_seconds() / 86400))
+def build_query(source: dict) -> tuple[str, list[str]]:
+    """The exact Google News query for a source, plus its accepted publishers.
+
+    Shared with audit_sources.py deliberately. When the audit built its own version of
+    the query it tested something the runtime never sends — and Google is sensitive
+    enough to phrasing that the two disagreed completely: the bare listings query
+    returned zero entries while the runtime's, with the self-exclusion appended,
+    returned a hundred. An audit that tests a different string than production sends is
+    worse than no audit, because it produces confident wrong answers in both directions.
+    """
     if source["method"] == "gnews":
         query = f"site:{source['url']}"
         if source.get("query"):
             query += f" {source['query']}"
-        accept = source.get("publisher") or [source.get("outlet", "")]
-    else:  # gnews_entity — deliberately not site-restricted
-        # Exclude The Circuit's own domain in the query itself rather than per source,
-        # so a new entity query cannot forget to do it.
-        exclusions = " ".join(f"-site:{d}" for d in SELF_DOMAINS)
-        query = f"{source['query']} {exclusions}"
-        accept = []  # any publisher may report on the entity
+        return query, (source.get("publisher") or [source.get("outlet", "")])
+
+    # gnews_entity — not site-restricted, that being the point of it. The Circuit's own
+    # domain is excluded here rather than per source so a new query cannot forget to.
+    exclusions = " ".join(f"-site:{d}" for d in SELF_DOMAINS)
+    return f"{source['query']} {exclusions}", []
+
+
+def _fetch_gnews(source: dict, since: datetime) -> tuple[list[Item], int]:
+    days = max(1, math.ceil((now_utc() - since).total_seconds() / 86400))
+    query, accept = build_query(source)
 
     parsed = parse_feed(_get(_gnews_url(query, days)).content)
     items: list[Item] = []
