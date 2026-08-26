@@ -208,10 +208,14 @@ def latest() -> dict:
         return local
 
 
-def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.json")) -> None:
+def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.json"),
+           merge_remote: bool = True) -> None:
     """Persist locally and, inside a git repo, commit + push the two state files.
 
-    Retries on a concurrent-push race by re-merging against the new origin.
+    Retries on a concurrent-push race by re-merging against the new origin. Pass
+    merge_remote=False for a deliberate reset, where the point is to REPLACE what origin
+    holds rather than union with it — unioning would resurrect the very state being
+    cleared.
 
     **Never touches anything but those two files.** An earlier version ran
     `git reset --hard origin/main` before committing: harmless on a fresh Actions
@@ -231,13 +235,14 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
 
     for _ in range(5):
         _git("fetch", "-q", "origin", "main")
-        remote = _git("show", "origin/main:watcher_state.json")
         merged = state
-        if remote.returncode == 0:
-            try:
-                merged = merge(state, _coerce(json.loads(remote.stdout)))
-            except Exception:
-                pass
+        if merge_remote:
+            remote = _git("show", "origin/main:watcher_state.json")
+            if remote.returncode == 0:
+                try:
+                    merged = merge(state, _coerce(json.loads(remote.stdout)))
+                except Exception:
+                    pass
         save(merged)
         _git("add", *files)
         if _git("diff", "--cached", "--quiet").returncode == 0:

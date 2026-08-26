@@ -120,6 +120,26 @@ def run(args) -> int:
 
     run_status.gate("fetched", len(candidates))
 
+    # ---- reset: forget everything and re-baseline ---------------------------
+    # For getting an honest reading of the thing. Clears the claim store and marks
+    # whatever is in the feeds right now as already-seen, so from the next tick onward
+    # the channel contains only stories published after this moment. Deliberately does
+    # NOT merge with origin's state — unioning would resurrect what is being cleared.
+    if args.reset and not args.dry_run:
+        fresh_state = state.blank()
+        keys = [k for item in candidates for k in dedup.keys_for(item)]
+        state.claim(fresh_state, keys)
+        slack.post(
+            f":arrows_counterclockwise: Reset — {len(candidates)} currently-circulating "
+            "items marked as seen. From here the channel shows only newly published "
+            "stories, on a 15-minute cadence."
+        )
+        run_status.delivered = True
+        state.record(fresh_state, merge_remote=False)
+        run_status.write()
+        print(f"Reset — baselined {len(candidates)} items from a clean slate.")
+        return 0
+
     # ---- first run: baseline silently rather than dumping the backlog -------
     live_state = state.blank() if args.dry_run else state.latest()
     if not args.dry_run and not state.exists():
@@ -320,6 +340,8 @@ def main() -> int:
     p.add_argument("--window-hours", type=float, default=None, help="override every source's window")
     p.add_argument("--source", action="append", help="limit to source key(s); repeatable")
     p.add_argument("--max-items", type=int, default=None, help="override the digest cap")
+    p.add_argument("--reset", action="store_true",
+                   help="clear state and re-baseline: only stories newer than now will post")
     p.add_argument("--backfill", action="store_true",
                    help="post what a baseline claimed but never showed (see gate 4)")
     p.add_argument("--status", action="store_true", help="print status.json and exit")
