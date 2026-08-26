@@ -82,7 +82,21 @@ def _coerce(doc: object) -> dict:
 
 
 def exists() -> bool:
-    return STATE_FILE.exists()
+    """Has this watcher ever run — anywhere?
+
+    Checks origin as well as the local file, and that is not paranoia. When the cloud
+    baselined for the first time it committed the state file to origin, but this machine's
+    working tree did not have it yet, so a local run read `False` here, treated itself as
+    a first run, posted a second "watcher is live", and claimed another 200 items as
+    already-seen — quietly consuming a run's worth of coverage. Any fresh clone would do
+    the same. The question is about the project's history, not this disk's.
+    """
+    if STATE_FILE.exists():
+        return True
+    if not _is_git_repo():
+        return False
+    _git("fetch", "-q", "origin", "main")
+    return _git("cat-file", "-e", "origin/main:watcher_state.json").returncode == 0
 
 
 def load() -> dict:
