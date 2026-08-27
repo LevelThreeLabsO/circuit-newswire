@@ -1,19 +1,19 @@
 {
-  "started_at": "2026-08-27T19:20:38+00:00",
-  "finished_at": "2026-08-27T19:20:52+00:00",
-  "duration_seconds": 13.6,
+  "started_at": "2026-08-27T19:23:39+00:00",
+  "finished_at": "2026-08-27T19:23:48+00:00",
+  "duration_seconds": 8.9,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 15,
-    "fresh": 15,
-    "relevant": 4,
-    "unseen": 1,
-    "unique": 1,
-    "posted": 1
+    "fetched": 19,
+    "fresh": 19,
+    "relevant": 6,
+    "unseen": 3,
+    "unique": 3,
+    "posted": 3
   },
-  "posted": 0,
-  "delivered": false,
-  "last_posted_at": "2026-08-27T19:02:53+00:00",
+  "posted": 3,
+  "delivered": true,
+  "last_posted_at": "2026-08-27T19:23:48+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
@@ -43,7 +43,7 @@
     "zawya": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 98
+      "in_window": 97
     },
     "arabnews": {
       "status": "ok",
@@ -63,7 +63,7 @@
     "wam": {
       "status": "ok",
       "fetched": 2,
-      "in_window": 60
+      "in_window": 62
     },
     "arabianbusiness": {
       "status": "ok",
@@ -93,7 +93,7 @@
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 22
+      "in_window": 21
     },
     "khaleejtimes": {
       "status": "ok",
@@ -117,7 +117,7 @@
     },
     "q_sovereign_funds": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 3,
       "in_window": 100
     },
     "q_energy_champions": {
@@ -157,8 +157,8 @@
     },
     "argus": {
       "status": "ok",
-      "fetched": 1,
-      "in_window": 24
+      "fetched": 2,
+      "in_window": 25
     },
     "energyintel": {
       "status": "ok",
@@ -197,13 +197,13 @@
     },
     "q_small_funds": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 100
     },
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 51
+      "in_window": 48
     },
     "moroccoworld": {
       "status": "ok",
@@ -213,48 +213,48 @@
     "ahram": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 85
+      "in_window": 84
     }
   },
   "consecutive_empty": {
-    "bloomberg": 1,
+    "bloomberg": 2,
     "reuters": 0,
-    "thenational": 16,
-    "agbi": 24,
-    "ft": 15,
+    "thenational": 17,
+    "agbi": 25,
+    "ft": 16,
     "zawya": 0,
-    "arabnews": 108,
+    "arabnews": 109,
     "wsj": 0,
-    "nyt": 101,
+    "nyt": 102,
     "wam": 0,
     "arabianbusiness": 0,
     "forbesme": 0,
-    "meed": 41,
-    "semafor": 119,
-    "argaam": 13,
-    "spa": 6,
-    "khaleejtimes": 3,
-    "gulfnews": 1,
-    "intelligenceonline": 121,
-    "peninsula": 1,
+    "meed": 42,
+    "semafor": 120,
+    "argaam": 14,
+    "spa": 7,
+    "khaleejtimes": 4,
+    "gulfnews": 2,
+    "intelligenceonline": 122,
+    "peninsula": 2,
     "q_sovereign_funds": 0,
     "q_energy_champions": 0,
-    "q_ports_logistics": 12,
-    "q_giga_projects": 31,
-    "q_gulf_tech": 13,
-    "q_hormuz": 1,
-    "tradewinds": 13,
-    "lloydslist": 4,
+    "q_ports_logistics": 13,
+    "q_giga_projects": 32,
+    "q_gulf_tech": 14,
+    "q_hormuz": 2,
+    "tradewinds": 14,
+    "lloydslist": 5,
     "argus": 0,
     "energyintel": 0,
-    "upstream": 31,
-    "gcaptain": 10,
-    "marineinsight": 28,
-    "tradearabia": 108,
+    "upstream": 32,
+    "gcaptain": 11,
+    "marineinsight": 29,
+    "tradearabia": 109,
     "saudigazette": 0,
-    "q_listings": 13,
-    "q_small_funds": 27,
-    "gulftimes": 81,
+    "q_listings": 14,
+    "q_small_funds": 0,
+    "gulftimes": 82,
     "moroccoworld": 0,
     "ahram": 0
   },
@@ -301,6 +301,6 @@
     "ahram": 0
   },
   "stale_sources": [],
-  "error": "src.slack_client.DeliveryError: Slack rejected the post: HTTP 404, body 'no_active_hooks'",
-  "error_traceback": "Traceback (most recent call last):\n  File \"/Users/srulifruchterji/circuit-newswire/poll.py\", line 267, in run\n    slack.post(text)\n    ~~~~~~~~~~^^^^^^\n  File \"/Users/srulifruchterji/circuit-newswire/src/slack_client.py\", line 56, in post\n    raise DeliveryError(\n        f\"Slack rejected the post: HTTP {r.status_code}, body {body[:200]!r}\"\n    )\nsrc.slack_client.DeliveryError: Slack rejected the post: HTTP 404, body 'no_active_hooks'\n"
+  "error": null,
+  "error_traceback": null
 }
