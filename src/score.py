@@ -34,7 +34,7 @@ language model scoring relevance by meaning would go instead; see `judge_hook()`
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -57,6 +57,8 @@ class Verdict:
     matched: list[str]
     vetoed: str | None = None
     bypass: str | None = None
+    # Axes hit by the headline alone. The anchor test uses these, not `axes`.
+    title_axes: list[str] = field(default_factory=list)
 
     @property
     def admitted(self) -> bool:
@@ -72,6 +74,8 @@ class Scorer:
     def __init__(self, config: dict | None = None):
         self.config = config if config is not None else yaml.safe_load(CONFIG_FILE.read_text())
         self.default_threshold = int(self.config.get("default_threshold", 4))
+        self.require_anchor = set(self.config.get("require_anchor", []) or [])
+        self.min_title_axes = int(self.config.get("min_title_axes", 0))
         self.axes: list[tuple[str, int, re.Pattern]] = []
         for axis in self.config.get("axes", []):
             self.axes.append((axis["name"], int(axis["points"]), _compile(axis.get("terms", []))))
@@ -104,8 +108,15 @@ class Scorer:
         if noise_hit:
             return Verdict(0, [], [], vetoed=noise_hit.group(0))
 
+        # Axes are scored on title + body, but tracked separately for the title, because
+        # the anchor test below reads only the headline. A feed description is enough to
+        # carry an off-beat story past the bar otherwise: FT's "Israel considers expelling
+        # UK from postwar Gaza headquarters" and "Syria's Kurds dissolve military force"
+        # both score 2 on their headline and cleared the threshold on body text alone.
+        title_text = f" {title} ".replace("’", "'")
         total = 0
         axes_hit: list[str] = []
+        title_axes: list[str] = []
         matched: list[str] = []
         for name, points, pattern in self.axes:
             hits = pattern.findall(text)
@@ -113,6 +124,8 @@ class Scorer:
                 total += points
                 axes_hit.append(name)
                 matched += [h if isinstance(h, str) else h[0] for h in hits[:3]]
+            if pattern.search(title_text):
+                title_axes.append(name)
         if self.money.search(text):
             total += self.money_points
             axes_hit.append("money")
@@ -122,7 +135,7 @@ class Scorer:
         seen: dict[str, None] = {}
         for m in matched:
             seen.setdefault(m.strip().lower(), None)
-        return Verdict(total, axes_hit, list(seen)[:6], bypass=bypass)
+        return Verdict(total, axes_hit, list(seen)[:6], bypass=bypass, title_axes=title_axes)
 
     def threshold_for(self, source_threshold: int | None) -> int:
         return int(source_threshold) if source_threshold is not None else self.default_threshold
@@ -132,6 +145,17 @@ class Scorer:
             return False
         if verdict.bypass:
             return True
+        # No anchor axis, no story — see require_anchor in scoring.yaml. Checked before
+        # the threshold so a high score on sector plus money cannot carry a story from
+        # outside the region.
+        if self.require_anchor and not (self.require_anchor & set(verdict.title_axes)):
+            return False
+        # The headline must carry two signals, not just a place name. A country alone is a
+        # war-and-diplomacy story: FT's "Syria's Kurds dissolve military force and
+        # integrate fighters with Damascus" anchors on Syria and nothing else, and cleared
+        # the bar on body text. Costs 0.4 points of recall and buys the whole class.
+        if self.min_title_axes and len(set(verdict.title_axes)) < self.min_title_axes:
+            return False
         return verdict.score >= self.threshold_for(source_threshold)
 
     def _byline(self, author: str) -> str | None:

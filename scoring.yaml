@@ -8,6 +8,21 @@
 # a word you add shows its cost as well as its benefit.
 
 default_threshold: 4
+
+# An item must hit at least one of these axes, whatever its score. They are the "is this
+# our region at all" test: a Gulf state, a named Gulf company or fund, a named principal,
+# or the conflict economics of the Gulf's waterways.
+#
+# This exists so thresholds can be loosened without admitting global business noise.
+# Measured on 48 hours of Bloomberg and Reuters, dropping the bar to 3 without it let in
+# "Thailand's Power Giant Sees Revenue Up 15%", "Kioxia, Sandisk Plan $31 Billion Japan
+# Memory Chip Expansion" and "Watch How LeBron James Scored $300 Million From Insurers" —
+# all of which score on sector plus money and name no part of this region.
+require_anchor: [entity, principal, geography, conflict_econ]
+
+# Distinct axes the HEADLINE must hit. A place name on its own is a war-and-diplomacy
+# story, not a business one, and body text is enough to carry it past the threshold.
+min_title_axes: 2
 money_points: 1
 money_pattern: '\$|\bbillion\b|\bmillion\b|\btrillion\b|\bbn\b|\d+\s?%|\bper cent\b|\bpercent\b'
 
@@ -274,6 +289,9 @@ axes:
       - Mideast
       - MENA
       - EMEA
+      - Iran
+      - Iranian
+      - Tehran
       - Egypt
       - Egyptian
       - Cairo
