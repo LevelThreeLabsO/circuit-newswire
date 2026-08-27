@@ -117,7 +117,10 @@ sources:
     url: wsj.com
     query: "(Gulf OR Saudi OR UAE OR Qatar OR Aramco OR sovereign wealth)"
     publisher: [WSJ, The Wall Street Journal, Wall Street Journal]
-    threshold: 6
+    # 4, not 6: the query is already Gulf-scoped, so 6 double-filtered and the outlet
+    # posted nothing at all in 48 hours despite filing on Dubai airport traffic and the
+    # US-Saudi nuclear agreement.
+    threshold: 4
     paywall: true
 
   - key: nyt
@@ -126,7 +129,7 @@ sources:
     url: nytimes.com
     query: "(Gulf OR Saudi OR UAE OR Qatar OR Aramco OR sovereign wealth fund)"
     publisher: [The New York Times, New York Times]
-    threshold: 6
+    threshold: 4
     paywall: true
 
   # The Emirati state wire. Serves HTML at every feed path; 77 items/day via Google News.

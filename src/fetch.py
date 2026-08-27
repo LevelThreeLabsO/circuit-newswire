@@ -186,10 +186,23 @@ def _strip_publisher(title: str, publisher: str) -> str:
     """
     t = title.strip()
     t = re.sub(r"^\[\d{4}-\d{2}-\d{2}\]\s*", "", t)
-    for sep in (" - ", " | "):   # Google uses a dash; some outlets bake in a pipe
-        if publisher and t.lower().endswith(f"{sep}{publisher.lower()}"):
-            return t[: -(len(publisher) + len(sep))].strip()
-    return re.sub(r"\s+[-|]\s+[^-|]{3,40}$", "", t).strip()
+
+    # Repeat, because the suffix can appear twice. Semafor bakes "- Semafor" into its own
+    # headlines and Google appends its own, so the raw title arrives as
+    # "The Gulf faces uneven rebound from war downturn - Semafor - Semafor". A single pass
+    # leaves one masthead on the headline, where it then scores as a beat word.
+    for _ in range(3):
+        stripped = t
+        for sep in (" - ", " | "):   # Google uses a dash; some outlets bake in a pipe
+            if publisher and stripped.lower().endswith(f"{sep}{publisher.lower()}"):
+                stripped = stripped[: -(len(publisher) + len(sep))].strip()
+        if stripped == t:
+            break
+        t = stripped
+
+    t = re.sub(r"\s+[-|]\s+[^-|]{3,40}$", "", t).strip()
+    # What is left of "- Semafor" once the masthead goes is not a headline.
+    return "" if len(t) < 15 else t
 
 
 # The Circuit's own domain, excluded from every entity query at the query itself. A
