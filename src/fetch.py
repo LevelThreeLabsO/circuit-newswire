@@ -211,6 +211,19 @@ def _strip_publisher(title: str, publisher: str) -> str:
 # on this beat and will not surface.
 SELF_DOMAINS = ("circuit.news",)
 
+# Appended to every entity query. Google honours negative terms, so the streaming farms
+# drop out before they ever reach the scorer.
+QUERY_EXCLUSIONS = (
+    '-"live stream" -livestream -streaming -"watch live" -"free stream" '
+    '-soccer -"match preview" -"full match" -highlights -"tv channel" '
+    # Social and UGC platforms. The publisher blocklist already drops these, but Google
+    # returns at most 100 entries per query, and a live football fixture involving a club
+    # named NEOM fills that budget with tweets and TikToks — starving the real stories
+    # the query exists to find.
+    '-site:x.com -site:twitter.com -site:instagram.com -site:tiktok.com '
+    '-site:facebook.com -site:reddit.com -site:youtube.com'
+)
+
 # Publishers never worth reading, regardless of query. Entity queries are not restricted
 # to a site — that is the point of them — so a query for NEOM or Diriyah pulls in football
 # fixtures and betting tipsters, both of which name Saudi clubs constantly, and a query
@@ -266,6 +279,15 @@ _STYLED_UNICODE = re.compile(r"[\uFF01-\uFF5E\U0001D400-\U0001D7FF]")
 # Symbol soup: "%**(Today===)", "~!!【OffiCial】", "+++【FIFA![LIVES'TREAMs!SKY+TV]".
 _SYMBOL_SOUP = re.compile(r"[\[\]{}【】!@#~%*+=|]{3,}")
 
+# A sports fixture: two sides joined by "v" or "vs", with a date or year nearby. Catches
+# the streaming farms' cleaner titles, which carry no styling or symbols at all.
+_FIXTURE = re.compile(
+    r"\b\w[\w'\-]*\s+vs?\.?\s+\w[\w'\-]*\b"
+    r"(?=.*(?:\b20\d{2}\b|\b\d{1,2}[./]\d{1,2}\b|\b\d{1,2}\s+"
+    r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))",
+    re.IGNORECASE,
+)
+
 
 def looks_like_spam(title: str) -> bool:
     """Is this a content farm rather than a story?
@@ -275,7 +297,8 @@ def looks_like_spam(title: str) -> bool:
     keyword axes (a real airline name, a real country, real business words), so scoring
     cannot catch them and this has to.
     """
-    if _SPAM_TITLE.search(title) or _STYLED_UNICODE.search(title) or _SYMBOL_SOUP.search(title):
+    if (_SPAM_TITLE.search(title) or _STYLED_UNICODE.search(title)
+            or _SYMBOL_SOUP.search(title) or _FIXTURE.search(title)):
         return True
     match = _SPAM_TOKEN.search(title)
     if not match:
@@ -365,7 +388,10 @@ def build_query(source: dict) -> tuple[str, list[str]]:
     # gnews_entity — not site-restricted, that being the point of it. The Circuit's own
     # domain is excluded here rather than per source so a new query cannot forget to.
     exclusions = " ".join(f"-site:{d}" for d in SELF_DOMAINS)
-    return f"{source['query']} {exclusions}", []
+    # Streaming-farm negatives too, so that spam is never fetched. Cheaper than filtering
+    # it afterwards, and it stops the farms consuming the 100-item cap real stories need.
+    # A Saudi club named NEOM guarantees this collision keeps recurring.
+    return f"{source['query']} {exclusions} {QUERY_EXCLUSIONS}", []
 
 
 def _fetch_gnews(source: dict, since: datetime) -> tuple[list[Item], int]:
