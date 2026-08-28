@@ -234,6 +234,7 @@ PUBLISHER_BLOCKLIST = (
     "blogspot", "wordpress.com", "groups.google", "issuu", "slideshare", "scribd",
     # Aggregators and notice boards seen in live output.
     "mshale", "news on air", "akashvani", "migflug", "travelobiz", "visaguide",
+    "parentzone", "totalsportek", "streameast", "sportsurge", "buffstream",
     # Job boards and sport streamers — a query for Talabat returns vacancies, one for
     # Roshn returns Saudi League fixtures.
     "naukrigulf", "bayt.com", "gulftalent", "indeed", "glassdoor", "fancode",
@@ -248,9 +249,22 @@ _SPAM_TITLE = re.compile(
     r"|complete guide|customer (?:service|support|care)|contact support"
     r"|book (?:flight|ticket)|booking number|extra bag|baggage allowance"
     r"|flight status|change flight|refund policy|check-?in online"
-    r"|tickets? link|save on extra|days to go until",
+    r"|tickets? link|save on extra|days to go until"
+    # Pirate sports streaming. These farms name a Saudi club, so they hit an entity and a
+    # city and score like a real story: "NEOM v Riyadh Live STREAMING free Soccer Match".
+    r"|live ?stream|livestream|streaming|watch ?live|free ?stream|stream(?:s|ing)? on"
+    r"|tv channel|live free|free access|full match|match ?thread|kick ?off time"
+    r"|soccer match|how to watch",
     re.IGNORECASE,
 )
+
+# Styled Unicode — fullwidth (Ｆｒｅｅ) and mathematical alphanumerics (𝐋𝐈𝐕𝐄) — is used
+# almost exclusively by content farms evading keyword filters. No newsroom writes headlines
+# in it.
+_STYLED_UNICODE = re.compile(r"[\uFF01-\uFF5E\U0001D400-\U0001D7FF]")
+
+# Symbol soup: "%**(Today===)", "~!!【OffiCial】", "+++【FIFA![LIVES'TREAMs!SKY+TV]".
+_SYMBOL_SOUP = re.compile(r"[\[\]{}【】!@#~%*+=|]{3,}")
 
 
 def looks_like_spam(title: str) -> bool:
@@ -261,7 +275,7 @@ def looks_like_spam(title: str) -> bool:
     keyword axes (a real airline name, a real country, real business words), so scoring
     cannot catch them and this has to.
     """
-    if _SPAM_TITLE.search(title):
+    if _SPAM_TITLE.search(title) or _STYLED_UNICODE.search(title) or _SYMBOL_SOUP.search(title):
         return True
     match = _SPAM_TOKEN.search(title)
     if not match:
