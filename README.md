@@ -158,6 +158,24 @@ All six ran silently in production in the original. None announced itself.
    every post, and could not be deleted from another account. This lives in the
    LevelThreeLabsO org, not a personal account, and the schedule is a line in a file.
 
+## One poller at a time
+
+Cadence comes from GitHub Actions alone. A local launchd agent ran alongside it for two
+days as a stopgap during a GitHub outage, and it caused a duplicate post: the cloud
+claimed and sent a Gulf News story at 14:55:13, the Mac claimed and sent the same story
+at 14:56:45, because the local run read the shared state a moment before the cloud's
+claim reached git.
+
+Claim-before-send protects overlapping runs of one poller, which exchange state within a
+single git remote and a single concurrency group. It cannot protect two independent
+schedulers whose only channel is a push that lands seconds later. So: run one. The agent
+is unloaded, and the plist is kept only for emergencies:
+
+```bash
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jewishinsider.circuit-newswire.plist
+launchctl bootout   gui/$(id -u)/com.jewishinsider.circuit-newswire
+```
+
 ## Setup
 
 1. Slack incoming webhook → repo secret `SLACK_WEBHOOK_URL`. Never in code: the original
