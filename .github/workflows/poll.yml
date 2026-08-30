@@ -33,9 +33,31 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python poll.py
+
+      # Poll repeatedly inside one job rather than once per trigger.
+      #
+      # GitHub's `schedule` is throttled on public repos — measured over 29-30 August it
+      # fired every two to six hours, not every fifteen minutes — and with a 30-minute
+      # publish window, anything appearing between runs is missed outright rather than
+      # delayed. Looping means a single sparse trigger still produces a real cadence,
+      # with no external pinger and nothing depending on a laptop staying awake.
+      #
+      # Three hours per invocation: long enough to bridge the observed gaps, well inside
+      # the six-hour job ceiling, and short enough that a wedged run frees the concurrency
+      # group within one news cycle. Overlapping runs are safe anyway — dedup state is
+      # shared through the repo and claimed before sending — and the concurrency group
+      # queues a new trigger rather than running it alongside.
+      - name: Poll every 5 minutes for ~3 hours
+        timeout-minutes: 200
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          PASSES=36
+          for i in $(seq 1 $PASSES); do
+            echo "--- pass $i/$PASSES $(date -u +%H:%M:%SZ) ---"
+            python poll.py || echo "pass $i failed, continuing"
+            [ "$i" -lt "$PASSES" ] && sleep 300
+          done
 
       # Runs on failure too: status.json is most useful precisely when the run broke,
       # and it is the only thing that will explain why after the fact.
