@@ -146,10 +146,13 @@ sources:
   # ══ Tier 2 — Gulf trade and regional press ══════════════════════════════════
 
   # 174 items a week, and a lot of it consumer-facing. Threshold does the work.
+  # Native feed returns 405 to GitHub's runners while working from a laptop — the kind
+  # of difference that only shows up in production logs. Google News carries it instead.
   - key: arabianbusiness
     outlet: Arabian Business
-    method: rss
-    url: "https://www.arabianbusiness.com/feed"
+    method: gnews
+    url: arabianbusiness.com
+    publisher: [Arabian Business]
     threshold: 5
 
   - key: forbesme
