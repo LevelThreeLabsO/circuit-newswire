@@ -129,12 +129,8 @@ def run(args) -> int:
         fresh_state = state.blank()
         keys = [k for item in candidates for k in dedup.keys_for(item)]
         state.claim(fresh_state, keys)
-        slack.post(
-            f":arrows_counterclockwise: Reset — {len(candidates)} currently-circulating "
-            "items marked as seen. From here the channel shows only newly published "
-            "stories, on a 15-minute cadence."
-        )
-        run_status.delivered = True
+        # Silent. A reset is an operator action, not news, and the channel gets only
+        # stories.
         state.record(fresh_state, merge_remote=False)
         run_status.write()
         print(f"Reset — baselined {len(candidates)} items from a clean slate.")
@@ -145,11 +141,8 @@ def run(args) -> int:
     if not args.dry_run and not state.exists():
         keys = [k for item in candidates for k in dedup.keys_for(item)]
         state.claim(live_state, keys)
-        slack.post(
-            ":satellite: Circuit newswire is live. Gulf business stories will appear "
-            "here as they publish."
-        )
-        run_status.delivered = True
+        # Silent baseline. The old "watcher is live" marker was another message nobody
+        # asked for.
         state.record(live_state)
         run_status.write()
         print(f"First run — baselined {len(candidates)} items, posted hello.")
@@ -259,14 +252,18 @@ def run(args) -> int:
     # Claim before sending — and only what is actually in this message, so items the cap
     # held over stay unclaimed and the next run can post them.
     claimed = [k for item in included for k in dedup.keys_for(item)]
+    remembered = [dedup.title_words(item.title) for item in included]
     state.claim(live_state, claimed)
-    for item in included:
-        state.remember_title(live_state, dedup.title_words(item.title), item.outlet)
+    for item, words in zip(included, remembered):
+        state.remember_title(live_state, words, item.outlet)
 
     try:
         slack.post(text)
     except DeliveryError as e:
-        state.unclaim(live_state, claimed)   # nothing is consumed by a failed delivery
+        # Roll back BOTH stores. Unclaiming alone left the headlines remembered, so gate 5
+        # went on suppressing other outlets' versions of stories nobody ever received.
+        state.unclaim(live_state, claimed)
+        state.forget_titles(live_state, remembered)
         run_status.delivered = False
         run_status.failed(e)
         state.record(live_state)
@@ -282,34 +279,24 @@ def run(args) -> int:
 
 
 def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, args) -> None:
-    """Self-reporting, then persist.
+    """Persist state and status. Posts NOTHING.
 
-    An automation that cannot say when it is broken makes its owner the monitoring
-    system. Two alarms: prolonged silence, and any source that has gone quiet or
-    unparseable for long enough that a dead feed is the likelier explanation.
+    This function used to send health alerts — a silence alarm and a dead-feed warning.
+    Both are gone. They were never asked for, and on 30 August the dead-feed alert fired
+    every five minutes into the live channel for an hour. An automation posts the content
+    it was built to post and nothing else; its own health belongs in status.json, which
+    `poll.py --status` reads and which is committed to the repo on every run.
+
+    If health alerting is ever wanted, it goes to a separate channel, with a persisted
+    cooldown, and only after being asked for.
     """
-    alerts = []
-    quiet = run_status.hours_since_post()
-    if quiet is not None and quiet >= 6 and not run_status.posted:
-        alerts.append(f":mute: No Circuit newswire items posted in {quiet:.0f}h. "
-                      "Either the Gulf is quiet or something upstream is broken.")
-    stale = run_status.stale_sources()
-    if stale:
-        alerts.append(":broken_heart: Sources returning nothing for 48h+: "
-                      f"{', '.join(stale)}. A dead feed answers HTTP 200 — worth a look.")
-
     if not args.dry_run:
-        for message in alerts:
-            try:
-                slack.post(message)
-            except DeliveryError as e:
-                print(f"  ! could not post health alert: {e}", file=sys.stderr)
+        run_status.write()
         state.record(live_state)
     else:
-        for message in alerts:
-            print(f"  (would alert) {message}")
-    doc = run_status.write()
-    print(f"Run took {doc['duration_seconds']}s.")
+        run_status.write()
+    doc = status.load()
+    print(f"Run took {doc.get('duration_seconds')}s.")
 
 
 # --------------------------------------------------------------------- subcommands
@@ -380,7 +367,24 @@ def main() -> int:
         return cmd_selftest()
     if args.audit:
         return cmd_audit(args)
-    return run(args)
+
+    # Any unhandled failure must still leave a status record, or the file keeps showing
+    # the last good run and the watcher looks healthy while it is broken — the precise
+    # failure this project exists to avoid. Only DeliveryError was covered before.
+    try:
+        return run(args)
+    except SystemExit:
+        raise
+    except BaseException as e:  # noqa: BLE001 — recorded, then re-raised untouched
+        try:
+            failed = status.Run()
+            failed.failed(e)
+            failed.write()
+            if not args.dry_run:
+                state.record(state.load())
+        except Exception as inner:  # noqa: BLE001
+            print(f"  ! could not record failure: {inner}", file=sys.stderr)
+        raise
 
 
 if __name__ == "__main__":

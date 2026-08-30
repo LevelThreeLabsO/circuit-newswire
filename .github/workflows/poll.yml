@@ -47,14 +47,23 @@ jobs:
       # group within one news cycle. Overlapping runs are safe anyway — dedup state is
       # shared through the repo and claimed before sending — and the concurrency group
       # queues a new trigger rather than running it alongside.
-      - name: Poll every 5 minutes for ~3 hours
-        timeout-minutes: 200
+      - name: Poll every 5 minutes for ~50 minutes, always on the latest code
+        timeout-minutes: 60
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          PASSES=36
+          # Pull before every pass, and keep the loop short.
+          #
+          # A long loop means a deploy does not take effect until the job ends. On
+          # 30 August a bad alert was fixed and pushed within minutes, but a three-hour
+          # job carried on running the old code and spammed a live channel for an hour
+          # afterwards. Two guards against a repeat: fifty minutes rather than three
+          # hours, so a stale job cannot outlive a fix for long, and a hard reset to
+          # origin before each pass, so a fix lands within five minutes even mid-run.
+          PASSES=10
           for i in $(seq 1 $PASSES); do
-            echo "--- pass $i/$PASSES $(date -u +%H:%M:%SZ) ---"
+            git fetch -q origin main && git reset -q --hard origin/main
+            echo "--- pass $i/$PASSES $(date -u +%H:%M:%SZ) code=$(git rev-parse --short HEAD) ---"
             python poll.py || echo "pass $i failed, continuing"
             [ "$i" -lt "$PASSES" ] && sleep 300
           done
