@@ -27,12 +27,10 @@ from pathlib import Path
 
 STATUS_FILE = Path(__file__).resolve().parent.parent / "status.json"
 
-# A source silent for this many HOURS is reported. Counting runs was wrong twice over:
-# the count assumed a 15-minute cadence while the cloud loop polls every five minutes, so
-# it fired after 16 hours instead of 48 — and it flagged sources that are merely
-# low-volume. Semafor legitimately went 33 hours between stories, and Intelligence Online
-# publishes a few times a week. Hours are what the sentence in the channel claims anyway.
-DEAD_SOURCE_HOURS = 72
+# A source that has returned nothing for this many consecutive runs is reported in the
+# channel. At a 15-minute cadence, 192 runs is 48 hours — long enough that a quiet
+# overnight source isn't flagged, short enough to catch a feed that died yesterday.
+DEAD_SOURCE_RUNS = 192
 
 
 def _now() -> str:
@@ -65,14 +63,9 @@ class Run:
         self.posted = 0
         self.delivered: bool | None = None
         self.error: str | None = None
-        # Set only when a health alert is actually delivered, so the cooldown below is
-        # never consumed by an alert nobody received.
-        self.alerted = False
         # Cross-run counters, keyed by source.
         self._streak_empty: dict[str, int] = dict(prev.get("consecutive_empty", {}))
         self._streak_parse: dict[str, int] = dict(prev.get("consecutive_parse_fail", {}))
-        # When each source last returned anything, for time-based staleness.
-        self._last_item: dict[str, str] = dict(prev.get("last_item_at", {}))
 
     # ---- per-source outcomes -------------------------------------------------
 
@@ -80,8 +73,6 @@ class Run:
         self.sources[key] = {"status": "ok", "fetched": fetched, "in_window": in_window}
         self._streak_parse[key] = 0
         self._streak_empty[key] = 0 if fetched else self._streak_empty.get(key, 0) + 1
-        if fetched:
-            self._last_item[key] = _now()
 
     def source_parse_fail(self, key: str, detail: str) -> None:
         """A feed that answered but could not be parsed.
@@ -109,42 +100,12 @@ class Run:
 
     # ---- health -------------------------------------------------------------
 
-    def stale_sources(self, hours: int = DEAD_SOURCE_HOURS) -> list[str]:
-        """Sources silent long enough that a dead feed is likelier than a quiet desk.
-
-        This is the check that would have caught JPost's eighteen dead days. It reports
-        only sources we have actually watched go quiet — a source with no recorded
-        history is not evidence of anything.
-        """
-        bad = []
-        for key in self.sources:
-            last = self.hours_since_key("last_item_at", key)
-            if last is not None and last >= hours:
-                bad.append(key)
+    def stale_sources(self, threshold: int = DEAD_SOURCE_RUNS) -> list[str]:
+        """Sources that have gone quiet or unparseable long enough to be worth saying
+        out loud. This is the check that would have caught JPost's eighteen dead days."""
+        bad = [k for k, n in self._streak_empty.items() if n >= threshold]
+        bad += [k for k, n in self._streak_parse.items() if n >= threshold]
         return sorted(set(bad))
-
-    def hours_since_key(self, field: str, key: str) -> float | None:
-        stamp = (self.prev.get(field) or {}).get(key)
-        if not stamp:
-            return None
-        try:
-            then = datetime.fromisoformat(stamp)
-        except ValueError:
-            return None
-        return (datetime.now(timezone.utc) - then).total_seconds() / 3600
-
-    def hours_since(self, field: str) -> float | None:
-        last = self.prev.get(field)
-        if not last:
-            return None
-        try:
-            then = datetime.fromisoformat(last)
-        except ValueError:
-            return None
-        return (datetime.now(timezone.utc) - then).total_seconds() / 3600
-
-    def hours_since_alert(self) -> float | None:
-        return self.hours_since("last_alert_at")
 
     def hours_since_post(self) -> float | None:
         last = self.prev.get("last_posted_at")
@@ -163,11 +124,6 @@ class Run:
         last_posted = self.prev.get("last_posted_at")
         if self.posted and self.delivered:
             last_posted = _now()
-        # WITHOUT THIS THE ALARM SPAMS. The cloud run polls every five minutes, so an
-        # alert with no cooldown posts twelve identical messages an hour. That happened
-        # in production on 30 August: this stamp was written, lost in a stash during a
-        # push conflict, and the alarm shipped without it.
-        last_alert = _now() if self.alerted else self.prev.get("last_alert_at")
         doc = {
             "started_at": self.started,
             "finished_at": finished.isoformat(timespec="seconds"),
@@ -179,11 +135,9 @@ class Run:
             "posted": self.posted,
             "delivered": self.delivered,
             "last_posted_at": last_posted,
-            "last_alert_at": last_alert,
             "sources": self.sources,
             "consecutive_empty": self._streak_empty,
             "consecutive_parse_fail": self._streak_parse,
-            "last_item_at": self._last_item,
             "stale_sources": self.stale_sources(),
             "error": self.error,
             "error_traceback": getattr(self, "error_traceback", None),

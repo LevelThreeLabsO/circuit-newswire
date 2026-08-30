@@ -186,7 +186,6 @@ def _strip_publisher(title: str, publisher: str) -> str:
     """
     t = title.strip()
     t = re.sub(r"^\[\d{4}-\d{2}-\d{2}\]\s*", "", t)
-    original = t
 
     # Repeat, because the suffix can appear twice. Semafor bakes "- Semafor" into its own
     # headlines and Google appends its own, so the raw title arrives as
@@ -201,13 +200,7 @@ def _strip_publisher(title: str, publisher: str) -> str:
             break
         t = stripped
 
-    # The generic fallback runs ONLY when the publisher-based strip found nothing. It used
-    # to run unconditionally, so a headline that had already lost its masthead lost a
-    # second real segment too — "Aramco lifts output - sources" became "Aramco lifts
-    # output", and shorter headlines were emptied entirely and dropped inside the fetcher,
-    # where no log records them.
-    if t == original:
-        t = re.sub(r"\s+[-|]\s+[^-|]{3,40}$", "", t).strip()
+    t = re.sub(r"\s+[-|]\s+[^-|]{3,40}$", "", t).strip()
     # What is left of "- Semafor" once the masthead goes is not a headline.
     return "" if len(t) < 15 else t
 
@@ -272,8 +265,7 @@ _SPAM_TITLE = re.compile(
     r"|tickets? link|save on extra|days to go until"
     # Pirate sports streaming. These farms name a Saudi club, so they hit an entity and a
     # city and score like a real story: "NEOM v Riyadh Live STREAMING free Soccer Match".
-    r"|live ?stream|livestream|watch ?live|free ?stream|stream(?:s|ing)? (?:on|free|live)"
-    r"|(?:free|live|hd|full) streaming"
+    r"|live ?stream|livestream|streaming|watch ?live|free ?stream|stream(?:s|ing)? on"
     r"|tv channel|live free|free access|full match|match ?thread|kick ?off time"
     r"|soccer match|how to watch",
     re.IGNORECASE,

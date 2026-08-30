@@ -259,18 +259,14 @@ def run(args) -> int:
     # Claim before sending — and only what is actually in this message, so items the cap
     # held over stay unclaimed and the next run can post them.
     claimed = [k for item in included for k in dedup.keys_for(item)]
-    remembered = [dedup.title_words(item.title) for item in included]
     state.claim(live_state, claimed)
-    for item, words in zip(included, remembered):
-        state.remember_title(live_state, words, item.outlet)
+    for item in included:
+        state.remember_title(live_state, dedup.title_words(item.title), item.outlet)
 
     try:
         slack.post(text)
     except DeliveryError as e:
-        # Roll back BOTH stores. Unclaiming alone left the headlines remembered, so gate 5
-        # went on suppressing other outlets' versions of stories nobody ever received.
-        state.unclaim(live_state, claimed)
-        state.forget_titles(live_state, remembered)
+        state.unclaim(live_state, claimed)   # nothing is consumed by a failed delivery
         run_status.delivered = False
         run_status.failed(e)
         state.record(live_state)
@@ -294,49 +290,25 @@ def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, 
     """
     alerts = []
     quiet = run_status.hours_since_post()
-    since_alert = run_status.hours_since_alert()
-
-    # Silence alarm: repeats no more often than the threshold itself.
-    if (quiet is not None and quiet >= SILENCE_HOURS and not run_status.posted
-            and (since_alert is None or since_alert >= SILENCE_HOURS)):
-        alerts.append(
-            f":mute: Nothing posted in {quiet:.1f}h. Last item went out at "
-            f"{run_status.prev.get('last_posted_at', 'unknown')}. The watcher is running "
-            f"— this run checked {run_status.counts.get('fetched', 0)} items across every "
-            "source — so either the region is quiet or something upstream is broken."
-        )
-
-    # Dead-feed alarm: once a day at most, and only for sources measured silent for
-    # DEAD_SOURCE_HOURS. This is the alert that spammed the channel on 30 August.
+    if quiet is not None and quiet >= 6 and not run_status.posted:
+        alerts.append(f":mute: No Circuit newswire items posted in {quiet:.0f}h. "
+                      "Either the Gulf is quiet or something upstream is broken.")
     stale = run_status.stale_sources()
-    if stale and (since_alert is None or since_alert >= STALE_ALERT_HOURS):
-        alerts.append(
-            f":broken_heart: No items from {', '.join(stale)} in "
-            f"{status.DEAD_SOURCE_HOURS}h+. A dead feed answers HTTP 200, so this is "
-            "worth checking with `poll.py --audit`."
-        )
+    if stale:
+        alerts.append(":broken_heart: Sources returning nothing for 48h+: "
+                      f"{', '.join(stale)}. A dead feed answers HTTP 200 — worth a look.")
 
     if not args.dry_run:
-        delivered_any = False
         for message in alerts:
             try:
                 slack.post(message)
-                delivered_any = True
             except DeliveryError as e:
                 print(f"  ! could not post health alert: {e}", file=sys.stderr)
-        # Only a delivered alert starts the cooldown. Stamping it on a failed attempt
-        # silences the alarm for two hours during exactly the Slack trouble it exists to
-        # report, and re-arms that silence on every retry.
-        run_status.alerted = delivered_any
-        # write() before record(): record() commits status.json, so writing afterwards
-        # meant the committed copy always lagged a pass and a fresh checkout never saw
-        # the cooldown stamp at all.
-        doc = run_status.write()
         state.record(live_state)
     else:
         for message in alerts:
             print(f"  (would alert) {message}")
-        doc = run_status.write()
+    doc = run_status.write()
     print(f"Run took {doc['duration_seconds']}s.")
 
 
@@ -408,24 +380,7 @@ def main() -> int:
         return cmd_selftest()
     if args.audit:
         return cmd_audit(args)
-
-    # Any unhandled failure must still leave a status record, or the file keeps showing
-    # the last good run and the watcher looks healthy while it is broken — the precise
-    # failure this project exists to avoid. Only DeliveryError was covered before.
-    try:
-        return run(args)
-    except SystemExit:
-        raise
-    except BaseException as e:  # noqa: BLE001 — recorded, then re-raised untouched
-        try:
-            failed = status.Run()
-            failed.failed(e)
-            failed.write()
-            if not args.dry_run:
-                state.record(state.load())
-        except Exception as inner:  # noqa: BLE001
-            print(f"  ! could not record failure: {inner}", file=sys.stderr)
-        raise
+    return run(args)
 
 
 if __name__ == "__main__":
