@@ -136,7 +136,17 @@ def merge(a: dict, b: dict) -> dict:
         for k, v in b.get(store, {}).items():
             if k not in out[store] or v < out[store][k]:
                 out[store][k] = v
-    combined = {(t.get("at"), t.get("words")): t for t in a.get("titles", []) + b.get("titles", [])}
+    # tuple(words), not words: `words` is a list, and a list inside a dict key raises
+    # TypeError. That is not a hypothetical — it fired on every call in production the
+    # moment any headline was remembered, and both callers caught it with a bare
+    # `except Exception`, so the union silently degraded to local-only state. The
+    # concurrent-push retry in record() then overwrote origin with local state, deleting
+    # the other run's claims; forensics on this repo found five commits where committed
+    # dedup keys disappeared that way, one of them wiping all 51 remembered headlines.
+    combined = {
+        (t.get("at"), tuple(t.get("words") or ())): t
+        for t in a.get("titles", []) + b.get("titles", [])
+    }
     out["titles"] = sorted(combined.values(), key=lambda t: t.get("at", ""))[-TITLE_MAX:]
     return out
 
@@ -160,6 +170,22 @@ def unclaim(state: dict, keys: list[str]) -> None:
     """Give keys back after a delivery failure, so the next run resends them."""
     for k in keys:
         state["seen"].pop(k, None)
+
+
+def forget_titles(state: dict, words_list: list[list[str]]) -> None:
+    """Drop remembered headlines after a failed delivery.
+
+    unclaim() alone is not a rollback. Headlines are remembered so gate 5 can spot four
+    outlets filing the same story within three hours — but if the digest never reached
+    Slack, those headlines were never published, and leaving them in place makes the
+    watcher suppress other outlets' coverage of news the desk never received. During a
+    sustained outage the store fills with phantoms and evicts genuinely posted headlines.
+    """
+    targets = {tuple(sorted(w)) for w in words_list}
+    state["titles"] = [
+        t for t in state.get("titles", [])
+        if tuple(sorted(t.get("words") or ())) not in targets
+    ]
 
 
 def stamp_first_seen(state: dict, key: str) -> datetime:

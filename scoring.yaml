@@ -461,6 +461,11 @@ axes:
       - subsidize
       - regulator
       - regulation
+      - premiums
+      - disruption
+      - shortage
+      - strikes
+      - force majeure
       - rules
       - licence
       - license
@@ -672,23 +677,20 @@ axes:
       - war-risk
       - war insurance
       - insurance costs
-      - premiums
       - airspace
       - canceled flights
       - cancelled flights
       - flight suspensions
       - supply disruption
-      - disruption
-      - disruptions
-      - shortage
-      - evacuation
-      - force majeure
       - ceasefire
       - Iran conflict
       - Iran war
       - missile attack
       - drone attack
-      - strikes
+      # Generic business English (premiums, disruption, shortage, strikes) was removed
+      # from this axis: it is an ANCHOR, so those words let stories naming no part of the
+      # region pass the region test. They live in `sector` instead, where they still
+      # score but cannot admit on their own.
 
 # ── Noise vetoes ────────────────────────────────────────────────────────────
 # Dropped regardless of score, matched against the headline only. Every one of these is
@@ -761,8 +763,14 @@ noise:
   # "underscoring" things; none of it is a story, and all of it scores geography+sector.
   - showcases
   - highlights UAE
-  - affirms
-  - reaffirms
+  # "affirms" alone killed a Moody's sovereign-rating story in the live feed — ratings
+  # agencies affirm ratings, which is core beat vocabulary. Vetoed only in the
+  # state-wire construction, where a minister affirms a commitment or a position.
+  - affirms commitment
+  - affirms support
+  - affirms position
+  - reaffirms commitment
+  - reaffirms support
   - underscores
   - stresses importance
   - honours
