@@ -63,6 +63,8 @@ class Run:
         self.posted = 0
         self.delivered: bool | None = None
         self.error: str | None = None
+        # Set when a health alert is posted, so the cooldown below can be honoured.
+        self.alerted = False
         # Cross-run counters, keyed by source.
         self._streak_empty: dict[str, int] = dict(prev.get("consecutive_empty", {}))
         self._streak_parse: dict[str, int] = dict(prev.get("consecutive_parse_fail", {}))
@@ -107,6 +109,20 @@ class Run:
         bad += [k for k, n in self._streak_parse.items() if n >= threshold]
         return sorted(set(bad))
 
+    def hours_since(self, field: str) -> float | None:
+        """Hours since a timestamp in the previous status, or None if never set."""
+        last = self.prev.get(field)
+        if not last:
+            return None
+        try:
+            then = datetime.fromisoformat(last)
+        except ValueError:
+            return None
+        return (datetime.now(timezone.utc) - then).total_seconds() / 3600
+
+    def hours_since_alert(self) -> float | None:
+        return self.hours_since("last_alert_at")
+
     def hours_since_post(self) -> float | None:
         last = self.prev.get("last_posted_at")
         if not last:
@@ -124,6 +140,10 @@ class Run:
         last_posted = self.prev.get("last_posted_at")
         if self.posted and self.delivered:
             last_posted = _now()
+        # Alert cooldown. Without this the silence alarm would fire on every pass — the
+        # cloud run polls every five minutes, so a two-hour silence would produce
+        # twenty-four identical alerts an hour, which is worse than no alarm at all.
+        last_alert = _now() if self.alerted else self.prev.get("last_alert_at")
         doc = {
             "started_at": self.started,
             "finished_at": finished.isoformat(timespec="seconds"),
@@ -135,6 +155,7 @@ class Run:
             "posted": self.posted,
             "delivered": self.delivered,
             "last_posted_at": last_posted,
+            "last_alert_at": last_alert,
             "sources": self.sources,
             "consecutive_empty": self._streak_empty,
             "consecutive_parse_fail": self._streak_parse,
