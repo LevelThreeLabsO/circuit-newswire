@@ -53,11 +53,6 @@ ROOT = Path(__file__).resolve().parent
 SOURCES_FILE = ROOT / "sources.yaml"
 DISPATCH_MINUTES = 15
 
-# Hours of silence before the channel is told. Deliberately short: silence and breakage
-# look identical from Slack, and the whole point of this alarm is that nobody should have
-# to run a command to tell them apart. Doubles as the cooldown between repeat alerts.
-SILENCE_HOURS = 2
-
 
 def load_sources(only: list[str] | None) -> tuple[list[dict], dict]:
     config = yaml.safe_load(SOURCES_FILE.read_text()) or {}
@@ -295,25 +290,13 @@ def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, 
     """
     alerts = []
     quiet = run_status.hours_since_post()
-    since_alert = run_status.hours_since_alert()
-    # Repeat no more often than the silence threshold itself: the cloud polls every five
-    # minutes, so an uncooled alarm would post two dozen identical messages an hour.
-    cooled = since_alert is None or since_alert >= SILENCE_HOURS
-
-    if quiet is not None and quiet >= SILENCE_HOURS and not run_status.posted and cooled:
-        alerts.append(
-            f":mute: Nothing posted in {quiet:.1f}h. Last item went out at "
-            f"{run_status.prev.get('last_posted_at', 'unknown')}. The watcher is running "
-            "— this run checked "
-            f"{run_status.counts.get('fetched', 0)} items across every source — so either "
-            "the region is quiet or something upstream is broken."
-        )
+    if quiet is not None and quiet >= 6 and not run_status.posted:
+        alerts.append(f":mute: No Circuit newswire items posted in {quiet:.0f}h. "
+                      "Either the Gulf is quiet or something upstream is broken.")
     stale = run_status.stale_sources()
-    if stale and cooled:
+    if stale:
         alerts.append(":broken_heart: Sources returning nothing for 48h+: "
                       f"{', '.join(stale)}. A dead feed answers HTTP 200 — worth a look.")
-    if alerts:
-        run_status.alerted = True
 
     if not args.dry_run:
         for message in alerts:
