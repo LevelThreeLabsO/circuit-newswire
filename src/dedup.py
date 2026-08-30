@@ -73,7 +73,12 @@ def stem(word: str) -> str:
 
 def title_words(title: str) -> list[str]:
     """Significant, stemmed words in a headline."""
-    raw = re.findall(r"[a-z0-9']+", (title or "").lower().replace("’", "'"))
+    # Apostrophes are stripped, not kept in the token class. Keeping them meant
+    # "Aramco's" and "Aramco" were different words, so a possessive in one outlet's
+    # headline and not another's dropped overlap below SIMILARITY and changed title_key —
+    # defeating both the cross-outlet gate and the reissue check for the same story.
+    text = (title or "").lower().replace("’", "'").replace("'", "")
+    raw = re.findall(r"[a-z0-9]+", text)
     return sorted({stem(w) for w in raw if len(w) > 2 and w not in STOPWORDS})
 
 
