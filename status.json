@@ -1,24 +1,24 @@
 {
-  "started_at": "2026-08-30T18:37:33+00:00",
-  "finished_at": "2026-08-30T18:37:35+00:00",
-  "duration_seconds": 2.6,
+  "started_at": "2026-08-30T18:38:57+00:00",
+  "finished_at": "2026-08-30T18:39:00+00:00",
+  "duration_seconds": 3.2,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 12,
-    "fresh": 12,
-    "relevant": 0,
-    "unseen": 0,
-    "unique": 0
+    "fetched": 10,
+    "fresh": 10,
+    "relevant": 1,
+    "unseen": 1,
+    "unique": 1,
+    "posted": 1
   },
-  "posted": 0,
-  "delivered": null,
-  "last_posted_at": "2026-08-30T18:03:52+00:00",
-  "last_alert_at": null,
+  "posted": 1,
+  "delivered": true,
+  "last_posted_at": "2026-08-30T18:39:00+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 10
+      "in_window": 9
     },
     "reuters": {
       "status": "ok",
@@ -66,9 +66,8 @@
       "in_window": 45
     },
     "arabianbusiness": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 200
+      "status": "error",
+      "detail": "HTTPError: 405 Client Error: Not Allowed for url: https://www.arabianbusiness.com/feed"
     },
     "forbesme": {
       "status": "ok",
@@ -88,7 +87,7 @@
     "argaam": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 42
+      "in_window": 47
     },
     "spa": {
       "status": "ok",
@@ -103,7 +102,7 @@
     "gulfnews": {
       "status": "ok",
       "fetched": 2,
-      "in_window": 80
+      "in_window": 81
     },
     "intelligenceonline": {
       "status": "ok",
@@ -158,7 +157,7 @@
     "argus": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 14
+      "in_window": 15
     },
     "energyintel": {
       "status": "ok",
@@ -203,7 +202,7 @@
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 38
+      "in_window": 39
     },
     "moroccoworld": {
       "status": "ok",
@@ -212,49 +211,49 @@
     },
     "ahram": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 100
     }
   },
   "consecutive_empty": {
-    "bloomberg": 51,
+    "bloomberg": 52,
     "reuters": 0,
-    "thenational": 33,
-    "agbi": 78,
-    "ft": 37,
-    "zawya": 39,
-    "arabnews": 73,
-    "wsj": 1,
-    "nyt": 195,
-    "wam": 3,
-    "arabianbusiness": 0,
-    "forbesme": 45,
-    "meed": 135,
-    "semafor": 213,
-    "argaam": 12,
-    "spa": 100,
-    "khaleejtimes": 1,
+    "thenational": 34,
+    "agbi": 79,
+    "ft": 38,
+    "zawya": 40,
+    "arabnews": 74,
+    "wsj": 2,
+    "nyt": 196,
+    "wam": 4,
+    "arabianbusiness": 1,
+    "forbesme": 46,
+    "meed": 136,
+    "semafor": 214,
+    "argaam": 13,
+    "spa": 101,
+    "khaleejtimes": 2,
     "gulfnews": 0,
-    "intelligenceonline": 215,
+    "intelligenceonline": 216,
     "peninsula": 0,
-    "q_sovereign_funds": 4,
-    "q_energy_champions": 5,
+    "q_sovereign_funds": 5,
+    "q_energy_champions": 6,
     "q_ports_logistics": 0,
-    "q_giga_projects": 25,
-    "q_gulf_tech": 52,
-    "q_hormuz": 51,
-    "tradewinds": 61,
-    "lloydslist": 52,
-    "argus": 50,
-    "energyintel": 50,
-    "upstream": 25,
-    "gcaptain": 58,
-    "marineinsight": 71,
-    "tradearabia": 202,
-    "saudigazette": 35,
-    "q_listings": 71,
-    "q_small_funds": 62,
-    "gulftimes": 51,
+    "q_giga_projects": 26,
+    "q_gulf_tech": 53,
+    "q_hormuz": 52,
+    "tradewinds": 62,
+    "lloydslist": 53,
+    "argus": 51,
+    "energyintel": 51,
+    "upstream": 26,
+    "gcaptain": 59,
+    "marineinsight": 72,
+    "tradearabia": 203,
+    "saudigazette": 36,
+    "q_listings": 72,
+    "q_small_funds": 63,
+    "gulftimes": 52,
     "moroccoworld": 0,
     "ahram": 0
   },
@@ -300,16 +299,12 @@
     "moroccoworld": 0,
     "ahram": 0
   },
-  "last_item_at": {
-    "reuters": "2026-08-30T18:37:33+00:00",
-    "arabianbusiness": "2026-08-30T18:37:33+00:00",
-    "gulfnews": "2026-08-30T18:37:35+00:00",
-    "peninsula": "2026-08-30T18:37:35+00:00",
-    "q_ports_logistics": "2026-08-30T18:37:35+00:00",
-    "moroccoworld": "2026-08-30T18:37:35+00:00",
-    "ahram": "2026-08-30T18:37:35+00:00"
-  },
-  "stale_sources": [],
+  "stale_sources": [
+    "intelligenceonline",
+    "nyt",
+    "semafor",
+    "tradearabia"
+  ],
   "error": null,
   "error_traceback": null
 }
