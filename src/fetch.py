@@ -383,7 +383,15 @@ def build_query(source: dict) -> tuple[str, list[str]]:
         query = f"site:{source['url']}"
         if source.get("query"):
             query += f" {source['query']}"
-        return query, (source.get("publisher") or [source.get("outlet", "")])
+        # Accept the domain as well as the masthead. Google labels a story's publisher
+        # inconsistently and changes its mind: Gulf News, Khaleej Times and Energy
+        # Intelligence all switched from "Gulf News" to "gulfnews.com" between 27 August
+        # and 1 September, at which point the publisher check rejected 100% of their items
+        # and three sources contributed nothing while reporting HTTP 200. The domain is
+        # already the thing the site: query asked for, so accepting it costs no strictness.
+        domain = str(source["url"]).replace("www.", "")
+        accept = list(source.get("publisher") or [source.get("outlet", "")])
+        return query, accept + [domain]
 
     # gnews_entity — not site-restricted, that being the point of it. The Circuit's own
     # domain is excluded here rather than per source so a new query cannot forget to.
