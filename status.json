@@ -1,18 +1,19 @@
 {
-  "started_at": "2026-09-02T16:31:48+00:00",
-  "finished_at": "2026-09-02T16:31:52+00:00",
-  "duration_seconds": 3.5,
+  "started_at": "2026-09-02T16:42:33+00:00",
+  "finished_at": "2026-09-02T16:42:37+00:00",
+  "duration_seconds": 3.9,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 23,
-    "fresh": 23,
-    "relevant": 4,
-    "unseen": 0,
-    "unique": 0
+    "fetched": 21,
+    "fresh": 21,
+    "relevant": 2,
+    "unseen": 1,
+    "unique": 1,
+    "posted": 1
   },
-  "posted": 0,
-  "delivered": null,
-  "last_posted_at": "2026-09-02T16:27:30+00:00",
+  "posted": 1,
+  "delivered": true,
+  "last_posted_at": "2026-09-02T16:42:37+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
@@ -21,8 +22,8 @@
     },
     "reuters": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 79
+      "fetched": 1,
+      "in_window": 75
     },
     "thenational": {
       "status": "ok",
@@ -41,12 +42,12 @@
     },
     "zawya": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 100
     },
     "arabnews": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 4,
       "in_window": 100
     },
     "wsj": {
@@ -61,13 +62,13 @@
     },
     "wam": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 87
     },
     "arabianbusiness": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 26
+      "in_window": 25
     },
     "forbesme": {
       "status": "ok",
@@ -82,7 +83,7 @@
     "semafor": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 35
+      "in_window": 34
     },
     "argaam": {
       "status": "ok",
@@ -92,16 +93,16 @@
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 7
+      "in_window": 6
     },
     "khaleejtimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 63
+      "in_window": 62
     },
     "gulfnews": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 2,
       "in_window": 100
     },
     "intelligenceonline": {
@@ -111,8 +112,8 @@
     },
     "peninsula": {
       "status": "ok",
-      "fetched": 1,
-      "in_window": 65
+      "fetched": 0,
+      "in_window": 50
     },
     "q_sovereign_funds": {
       "status": "ok",
@@ -126,7 +127,7 @@
     },
     "q_ports_logistics": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 2,
       "in_window": 100
     },
     "q_giga_projects": {
@@ -141,13 +142,13 @@
     },
     "q_hormuz": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "tradewinds": {
       "status": "ok",
-      "fetched": 3,
-      "in_window": 29
+      "fetched": 2,
+      "in_window": 28
     },
     "lloydslist": {
       "status": "ok",
@@ -156,12 +157,12 @@
     },
     "argus": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 32
+      "fetched": 1,
+      "in_window": 33
     },
     "energyintel": {
       "status": "ok",
-      "fetched": 5,
+      "fetched": 0,
       "in_window": 40
     },
     "upstream": {
@@ -182,7 +183,7 @@
     "tradearabia": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 35
+      "in_window": 32
     },
     "saudigazette": {
       "status": "ok",
@@ -202,12 +203,12 @@
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 62
+      "in_window": 63
     },
     "moroccoworld": {
       "status": "ok",
       "fetched": 4,
-      "in_window": 53
+      "in_window": 50
     },
     "ahram": {
       "status": "ok",
@@ -217,15 +218,15 @@
   },
   "consecutive_empty": {
     "bloomberg": 0,
-    "reuters": 3,
+    "reuters": 0,
     "thenational": 9,
     "agbi": 12,
     "ft": 11,
-    "zawya": 0,
+    "zawya": 1,
     "arabnews": 0,
     "wsj": 0,
     "nyt": 29,
-    "wam": 0,
+    "wam": 1,
     "arabianbusiness": 22,
     "forbesme": 0,
     "meed": 14,
@@ -233,9 +234,9 @@
     "argaam": 9,
     "spa": 77,
     "khaleejtimes": 7,
-    "gulfnews": 1,
+    "gulfnews": 0,
     "intelligenceonline": 485,
-    "peninsula": 0,
+    "peninsula": 1,
     "q_sovereign_funds": 31,
     "q_energy_champions": 17,
     "q_ports_logistics": 0,
@@ -244,8 +245,8 @@
     "q_hormuz": 0,
     "tradewinds": 0,
     "lloydslist": 0,
-    "argus": 5,
-    "energyintel": 0,
+    "argus": 0,
+    "energyintel": 1,
     "upstream": 9,
     "gcaptain": 178,
     "marineinsight": 9,
