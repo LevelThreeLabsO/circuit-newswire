@@ -1,119 +1,99 @@
 {
-  "started_at": "2026-09-03T11:11:16+00:00",
-  "finished_at": "2026-09-03T11:11:19+00:00",
-  "duration_seconds": 3.3,
+  "started_at": "2026-09-03T11:11:18+00:00",
+  "finished_at": "2026-09-03T11:12:21+00:00",
+  "duration_seconds": 63.2,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 26,
-    "fresh": 26,
-    "relevant": 5,
-    "unseen": 1,
-    "unique": 1,
-    "posted": 1
+    "fetched": 7,
+    "fresh": 7,
+    "relevant": 4,
+    "unseen": 3,
+    "unique": 3,
+    "posted": 3
   },
-  "posted": 1,
+  "posted": 3,
   "delivered": true,
-  "last_posted_at": "2026-09-03T11:11:19+00:00",
+  "last_posted_at": "2026-09-03T11:12:21+00:00",
   "sources": {
     "bloomberg": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:bloomberg.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Kuwait%20OR%20Aramco%20OR%20ADNOC%20OR%20PIF%20OR%20Mubadala)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by Nam"
     },
     "reuters": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:reuters.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Kuwait%20OR%20Oman%20OR%20Bahrain%20OR%20Aramco%20OR%20ADNOC)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameR"
     },
     "thenational": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 20
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.thenationalnews.com', port=443): Max retries exceeded with url: /arc/outboundfeeds/rss/category/business/?outputType=xml (Caused by NameResolutionError(\"HTTPSConnection(host='www.thenationalnews.com', port=443): Failed to resolve 'www.thenationalnews.co"
     },
     "agbi": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 10
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.agbi.com', port=443): Max retries exceeded with url: /feed/ (Caused by NameResolutionError(\"HTTPSConnection(host='www.agbi.com', port=443): Failed to resolve 'www.agbi.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
     },
     "ft": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 25
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.ft.com', port=443): Max retries exceeded with url: /middle-east?format=rss (Caused by NameResolutionError(\"HTTPSConnection(host='www.ft.com', port=443): Failed to resolve 'www.ft.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
     },
     "zawya": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:zawya.com%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news.google.com', port=443): Failed to resolve 'news.google.com' ([Errno 8] no"
     },
     "arabnews": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:arabnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20energy%20OR%20PIF%20OR%20Aramco)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnect"
     },
     "wsj": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 22
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:wsj.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Aramco%20OR%20sovereign%20wealth)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection("
     },
     "nyt": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 2
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:nytimes.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Aramco%20OR%20sovereign%20wealth%20fund)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPS"
     },
     "wam": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 77
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:wam.ae%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news.google.com', port=443): Failed to resolve 'news.google.com' ([Errno 8] noden"
     },
     "arabianbusiness": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 9
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:arabianbusiness.com%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news.google.com', port=443): Failed to resolve 'news.google.com' ([E"
     },
     "forbesme": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 500
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.forbesmiddleeast.com', port=443): Max retries exceeded with url: /feed/ (Caused by NameResolutionError(\"HTTPSConnection(host='www.forbesmiddleeast.com', port=443): Failed to resolve 'www.forbesmiddleeast.com' ([Errno 8] nodename nor servname provided, o"
     },
     "meed": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 4
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:meed.com%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news.google.com', port=443): Failed to resolve 'news.google.com' ([Errno 8] nod"
     },
     "semafor": {
-      "status": "ok",
-      "fetched": 3,
-      "in_window": 39
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:semafor.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news.google.com', port=443): F"
     },
     "argaam": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 31
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:argaam.com%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news.google.com', port=443): Failed to resolve 'news.google.com' ([Errno 8] n"
     },
     "spa": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 29
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:spa.gov.sa%20(investment%20OR%20economy%20OR%20energy%20OR%20agreement%20OR%20fund)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='news"
     },
     "khaleejtimes": {
-      "status": "ok",
-      "fetched": 3,
-      "in_window": 84
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:khaleejtimes.com%20(business%20OR%20economy%20OR%20investment%20OR%20markets%20OR%20energy)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(ho"
     },
     "gulfnews": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:gulfnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20markets%20OR%20energy)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(host='"
     },
     "intelligenceonline": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 50
+      "status": "error",
+      "detail": "ConnectionError: HTTPConnectionPool(host='feeds.feedburner.com', port=80): Max retries exceeded with url: /IntelligenceOnline (Caused by NameResolutionError(\"HTTPConnection(host='feeds.feedburner.com', port=80): Failed to resolve 'feeds.feedburner.com' ([Errno 8] nodename nor servname provided, or n"
     },
     "peninsula": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 83
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='news.google.com', port=443): Max retries exceeded with url: /rss/search?q=site:thepeninsulaqatar.com%20(business%20OR%20economy%20OR%20investment%20OR%20energy%20OR%20QIA)%20when:1d&hl=en-US&gl=US&ceid=US:en (Caused by NameResolutionError(\"HTTPSConnection(h"
     },
     "q_sovereign_funds": {
       "status": "ok",
@@ -217,46 +197,46 @@
     }
   },
   "consecutive_empty": {
-    "bloomberg": 2,
-    "reuters": 0,
-    "thenational": 1,
-    "agbi": 10,
-    "ft": 0,
-    "zawya": 0,
-    "arabnews": 0,
-    "wsj": 3,
-    "nyt": 7,
-    "wam": 0,
-    "arabianbusiness": 8,
-    "forbesme": 0,
-    "meed": 9,
-    "semafor": 0,
-    "argaam": 22,
-    "spa": 0,
-    "khaleejtimes": 0,
-    "gulfnews": 0,
-    "intelligenceonline": 555,
-    "peninsula": 2,
-    "q_sovereign_funds": 6,
+    "bloomberg": 11,
+    "reuters": 1,
+    "thenational": 8,
+    "agbi": 5,
+    "ft": 66,
+    "zawya": 1,
+    "arabnews": 1,
+    "wsj": 1,
+    "nyt": 84,
+    "wam": 5,
+    "arabianbusiness": 1,
+    "forbesme": 6,
+    "meed": 5,
+    "semafor": 30,
+    "argaam": 7,
+    "spa": 33,
+    "khaleejtimes": 1,
+    "gulfnews": 1,
+    "intelligenceonline": 540,
+    "peninsula": 1,
+    "q_sovereign_funds": 1,
     "q_energy_champions": 0,
-    "q_ports_logistics": 69,
-    "q_giga_projects": 6,
-    "q_gulf_tech": 75,
-    "q_hormuz": 21,
+    "q_ports_logistics": 54,
+    "q_giga_projects": 1,
+    "q_gulf_tech": 60,
+    "q_hormuz": 6,
     "tradewinds": 0,
     "lloydslist": 0,
     "argus": 0,
-    "energyintel": 46,
-    "upstream": 9,
-    "gcaptain": 45,
-    "marineinsight": 79,
-    "tradearabia": 542,
-    "saudigazette": 8,
-    "q_listings": 69,
-    "q_small_funds": 103,
-    "gulftimes": 51,
+    "energyintel": 31,
+    "upstream": 1,
+    "gcaptain": 30,
+    "marineinsight": 64,
+    "tradearabia": 527,
+    "saudigazette": 36,
+    "q_listings": 54,
+    "q_small_funds": 88,
+    "gulftimes": 36,
     "moroccoworld": 0,
-    "ahram": 3
+    "ahram": 1
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
