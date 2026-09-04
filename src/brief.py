@@ -31,7 +31,9 @@ from zoneinfo import ZoneInfo
 
 SHORTLIST = 15          # how many the model chooses from
 WANTED = 5
-MODEL = "gemini-2.5-flash"
+# gemini-2.5-flash is closed to new API keys — a fresh key gets 404 NOT_FOUND with a
+# pointer to this model. Verified working against the real key before deploying.
+MODEL = "gemini-3.6-flash"
 
 # Outlets The Circuit actually relies on, from counting every outbound link in 300 of
 # their posts. A story these broke carries more weight for this desk than the same story
@@ -125,10 +127,25 @@ decision.
 Avoid: routine market wraps, index moves, gold prices, scheduled data releases, conference \
 announcements, vendor press releases, and anything whose only claim is that a number changed.
 
-For each chosen story write ONE sentence on why it matters to this desk — the \
-consequence, not a summary of the headline. No adjectives beyond what the facts carry. \
-Never invent detail that is not in the headline: if the headline does not say the size of \
-a deal, do not state it.
+For each chosen story write ONE sentence on why it matters to this desk.
+
+This sentence must NOT restate the headline. Assume the reader has read it. Say what the \
+development implies, changes or reveals — the second-order point an editor would make in \
+a news meeting. Examples of the difference:
+
+  headline: "Egypt targets $3bn from new bond issuances"
+  bad  (restatement): "Egypt is tapping debt markets for $3 billion to meet funding needs."
+  good (consequence): "First test of investor appetite for Egyptian paper since the IMF \
+review, and the pricing will set the floor for the region's other deficit borrowers."
+
+  headline: "Adnoc keeps loading LNG on tankers despite Hormuz disruption"
+  bad  (restatement): "Adnoc is maintaining LNG exports despite disruption."
+  good (consequence): "Cuts against the assumption that Gulf gas exports have stalled, \
+and suggests buyers are still accepting Hormuz transit risk."
+
+Do not invent detail that is not in the headline: no deal sizes, dates, names or causes \
+that are not there. Where the implication is genuinely uncertain, say what it would tell \
+you rather than asserting an outcome. No adjectives beyond what the facts carry.
 
 Return the index numbers as given, not a rewritten list."""
 
@@ -195,7 +212,13 @@ def _choose_with_gemini(shortlist: list[dict]) -> list[dict]:
             system_instruction=SYSTEM_PROMPT,
             response_mime_type="application/json",
             response_schema=schema,
-            max_output_tokens=1200,
+            # 4000, not 1200, and thinking held low. gemini-3.6-flash is a thinking
+            # model: reasoning tokens count against max_output_tokens, and at 1200 it
+            # spent 1,149 of them thinking and 47 answering, so the JSON came back
+            # truncated mid-string and every run silently fell back to ranking. Measured
+            # need with thinking_level=low is ~230 output tokens.
+            max_output_tokens=4000,
+            thinking_config=types.ThinkingConfig(thinking_level="low"),
         ),
     )
     payload = json.loads((response.text or "{}").strip())

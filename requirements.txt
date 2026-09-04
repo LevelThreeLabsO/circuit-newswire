@@ -2,3 +2,6 @@ requests>=2.31
 PyYAML>=6.0
 feedparser>=6.0
 python-dotenv>=1.0
+# The briefing's editorial pass. Absent, brief.py silently fell back to
+# ranking-only selection in the cloud while working locally.
+google-genai>=1.0
