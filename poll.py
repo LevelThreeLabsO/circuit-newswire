@@ -42,7 +42,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from src import dedup, digest, state, status
+from src import dedup, digest, postlog, state, status
 from src.fetch import Item, ParseFailure, fetch_all, now_utc
 from src.score import Scorer
 from src.slack_client import DeliveryError, SlackClient
@@ -225,11 +225,17 @@ def run(args) -> int:
     # ---- gate 5: not the same story another outlet just filed -------------
     unique: list[Item] = []
     recent = list(live_state["titles"])
+    log = postlog.load()
     for item in sorted(unseen, key=lambda i: i.effective_date or now):
         match = dedup.cross_outlet_match(item, recent)
         if match:
             if args.dry_run and args.verbose:
                 print(f"  · dup of {match.get('outlet')}: {item.title[:70]}")
+            if not args.dry_run:
+                # The suppressed copy is evidence about the story we did post: another
+                # newsroom thought it worth filing. The briefing ranks on that.
+                postlog.bump_corroboration(
+                    log, dedup.title_words(item.title), dedup.overlap, dedup.SIMILARITY)
             continue
         unique.append(item)
         recent.append({"words": dedup.title_words(item.title), "at": "", "outlet": item.outlet})
@@ -273,6 +279,10 @@ def run(args) -> int:
 
     run_status.delivered = True
     run_status.posted = len(included)
+    # Only after Slack confirmed. The log is what the briefing reads, so an entry in it
+    # must mean the desk actually saw the story.
+    postlog.record(log, included, dedup.title_words)
+    postlog.save(log)
     print(f"Posted {len(included)} item(s).")
     _housekeeping(run_status, slack, live_state, args)
     return 0
@@ -292,7 +302,7 @@ def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, 
     """
     if not args.dry_run:
         run_status.write()
-        state.record(live_state)
+        state.record(live_state, files=("watcher_state.json", "status.json", "posted_log.json"))
     else:
         run_status.write()
     doc = status.load()

@@ -1,0 +1,41 @@
+name: briefing
+
+on:
+  # Fired at 6am, midday and 6pm Eastern by the same Apps Script project that drives the
+  # newswire (functions briefMorning / briefMidday / briefEvening). Apps Script triggers
+  # honour the project's timezone, so these follow US daylight saving automatically —
+  # a GitHub cron would drift an hour twice a year.
+  workflow_dispatch:
+  # Fallback only, in UTC, at the winter offsets. If the Apps Script triggers are ever
+  # deleted the briefing still lands, an hour off in summer.
+  schedule:
+    - cron: "0 11,17,23 * * *"
+
+permissions:
+  contents: write
+
+# Never two briefings at once. cancel-in-progress stays false so a run is not killed
+# mid-post, which would leave the period marked done with nothing delivered.
+concurrency:
+  group: brief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - run: python brief.py
+        env:
+          # A separate channel from the newswire, on purpose: the newswire's channel gets
+          # stories and nothing else.
+          SLACK_BRIEF_WEBHOOK_URL: ${{ secrets.SLACK_BRIEF_WEBHOOK_URL }}
+          # Optional. Without it the briefing still posts, selected by ranking alone and
+          # saying so in the message.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
