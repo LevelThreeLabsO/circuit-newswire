@@ -163,7 +163,10 @@ def _gemini_available() -> bool:
 def choose(shortlist: list[dict]) -> tuple[list[dict], str]:
     """Pick five from the shortlist. Returns (chosen, how) — 'gemini' or 'ranked'."""
     if len(shortlist) <= WANTED:
-        return shortlist, "ranked"
+        # Nothing to select: the period produced five or fewer stories, so all of them
+        # ship. Distinct from the fallback below, because the message must not tell the
+        # reader the editorial pass failed when it simply had no choice to make.
+        return shortlist, "all"
     if not _gemini_available():
         return shortlist[:WANTED], "ranked"
     try:
@@ -312,4 +315,8 @@ def format_brief(chosen: list[dict], how: str, period_hours: float, total: int,
         # Say so. A list assembled by weighting alone may contain two versions of one
         # story, and the reader should know which kind of list they are holding.
         lines.append("_Selected by ranking only — editorial pass unavailable this run._")
+    elif how == "all":
+        # Not a failure, and not a curated five either: everything the period produced.
+        lines.append(f"_A quiet period — this is everything the newswire posted, "
+                     f"not a selection._")
     return "\n".join(lines).strip()
