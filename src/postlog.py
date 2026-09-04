@@ -110,8 +110,18 @@ def last_brief_at(entries: list[dict]) -> str | None:
     return None
 
 
-def mark_brief(entries: list[dict], chosen: int) -> None:
-    entries.append({"at": _now(), "kind": "brief", "chosen": chosen})
+def mark_brief(entries: list[dict], chosen: int, edition: str | None = None) -> None:
+    """Record that a briefing went out, tagged with which edition it was.
+
+    The edition key ("2026-09-04-Morning") is what makes --if-due idempotent: the check
+    is "has THIS edition already posted", not "how long since the last one". Without it,
+    a run at 6:05 and another at 6:20 both look due.
+    """
+    entries.append({"at": _now(), "kind": "brief", "chosen": chosen, "edition": edition})
+
+
+def edition_posted(entries: list[dict], edition: str) -> bool:
+    return any(e.get("kind") == "brief" and e.get("edition") == edition for e in entries)
 
 
 def merge(a: list[dict], b: list[dict]) -> list[dict]:

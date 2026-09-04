@@ -1,15 +1,14 @@
 name: briefing
 
 on:
-  # Fired at 6am, midday and 6pm Eastern by the same Apps Script project that drives the
-  # newswire (functions briefMorning / briefMidday / briefEvening). Apps Script triggers
-  # honour the project's timezone, so these follow US daylight saving automatically —
-  # a GitHub cron would drift an hour twice a year.
+  # Manual only. The scheduled editions now ride poll.yml, which fires every 15 minutes
+  # from a trigger proven to work.
+  #
+  # The cron that used to live here fired at 11/17/23 UTC — 7am, 1pm and 7pm Eastern in
+  # summer, not the 6/12/6 asked for — and GitHub lagged it by up to two hours, which is
+  # how a briefing labelled "Midday" arrived at 3:11pm. Removed rather than corrected:
+  # two mechanisms posting to one channel is how a channel gets duplicates.
   workflow_dispatch:
-  # Fallback only, in UTC, at the winter offsets. If the Apps Script triggers are ever
-  # deleted the briefing still lands, an hour off in summer.
-  schedule:
-    - cron: "0 11,17,23 * * *"
 
 permissions:
   contents: write
@@ -31,7 +30,9 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
 
-      - run: python brief.py
+      # --if-due even on a manual dispatch, so pressing the button outside a window
+      # cannot inject an off-schedule edition. Force one locally with `python brief.py`.
+      - run: python brief.py --if-due
         env:
           # A separate channel from the newswire, on purpose: the newswire's channel gets
           # stories and nothing else.

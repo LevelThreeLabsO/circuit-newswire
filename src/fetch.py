@@ -307,14 +307,33 @@ def looks_like_spam(title: str) -> bool:
     return any(c.islower() for c in token) and any(c.isupper() or c.isdigit() for c in token)
 
 
+# Arabic letter forms that Google and the outlets themselves use interchangeably. Argaam
+# is labelled "أرقام" (hamza-alef) where our list held "ارقام" (plain alef) — different
+# code points, so the match failed and 100% of its items were rejected while every request
+# returned HTTP 200. Normalising the class beats adding one more spelling: the same trap
+# waits in WAM, SPA and QNA's Arabic mastheads.
+_ARABIC_FOLD = str.maketrans({
+    "أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا",   # alef with hamza / madda
+    "ى": "ي", "ئ": "ي",                          # alef maqsura, yeh with hamza
+    "ة": "ه",                                     # teh marbuta
+    "ؤ": "و",
+})
+_ARABIC_MARKS = dict.fromkeys(range(0x064B, 0x0653))   # harakat
+
+
+def _fold(text: str) -> str:
+    """Comparison form: lowercased, Arabic letter variants and diacritics normalised."""
+    return (text or "").lower().translate(_ARABIC_FOLD).translate(_ARABIC_MARKS).strip()
+
+
 def _publisher_matches(publisher: str, accept: list[str]) -> bool:
     """Google honours site: loosely. Accept only the outlet we asked for."""
-    p = publisher.lower()
+    p = _fold(publisher)
     if any(b in p for b in PUBLISHER_BLOCKLIST):
         return False
     if not accept:
         return True
-    return any(a.lower() in p or p in a.lower() for a in accept if a)
+    return any(_fold(a) in p or p in _fold(a) for a in accept if a)
 
 
 def is_english(title: str) -> bool:

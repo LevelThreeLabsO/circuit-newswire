@@ -261,20 +261,39 @@ def _escape(text: str) -> str:
 EASTERN = ZoneInfo("America/New_York")
 
 
+# The three editions, by Eastern hour. A briefing is "due" from its hour until the next
+# edition's hour, so a run that lands late still posts the right edition under the right
+# name — the GitHub schedule fallback once fired two hours late and posted a briefing
+# labelled "Midday" at 3:11pm.
+EDITIONS = ((6, "Morning"), (12, "Midday"), (18, "Evening"))
+
+
+def current_edition(when: datetime | None = None) -> tuple[str, str] | None:
+    """The edition in force right now, as (key, label), or None outside all windows.
+
+    key is date-and-edition in Eastern — "2026-09-04-Morning" — so a marker for it can
+    say which edition has already gone out, rather than only when the last one ran.
+    """
+    et = (when or datetime.now(timezone.utc)).astimezone(EASTERN)
+    active = None
+    for hour, label in EDITIONS:
+        if et.hour >= hour:
+            active = (hour, label)
+    if active is None:
+        return None                       # before 6am Eastern: no edition yet today
+    return f"{et:%Y-%m-%d}-{active[1]}", active[1]
+
+
 def edition_label(when: datetime | None = None) -> str:
-    hour = (when or datetime.now(timezone.utc)).astimezone(EASTERN).hour
-    if hour < 11:
-        return "Morning"
-    if hour < 16:
-        return "Midday"
-    return "Evening"
+    edition = current_edition(when)
+    return edition[1] if edition else "Overnight"
 
 
 def format_brief(chosen: list[dict], how: str, period_hours: float, total: int,
-                 when: datetime | None = None) -> str:
+                 when: datetime | None = None, label: str | None = None) -> str:
     """The Slack message. Plain, and honest about how the five were chosen."""
     count = len(chosen)
-    header = (f"*{edition_label(when)} briefing* — {count} to check from "
+    header = (f"*{label or edition_label(when)} briefing* — {count} to check from "
               f"{total} stor{'y' if total == 1 else 'ies'} in the last {period_hours:.0f}h")
     lines = [header, ""]
     for n, e in enumerate(chosen, 1):

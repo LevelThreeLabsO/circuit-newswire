@@ -54,6 +54,21 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
+      # The briefing rides this cadence rather than owning triggers of its own.
+      #
+      # Its Apps Script triggers were never installed — `setup` ran a minute before the
+      # code containing them was pushed — so no scheduled edition ever fired, while this
+      # workflow's own trigger fired 36 times out of 40. Rather than add a second
+      # mechanism to maintain, --if-due checks whether a 6am/12pm/6pm Eastern edition is
+      # due and unsent, and exits silently otherwise. Two runs in the same hour cannot
+      # double-post: the marker records which EDITION went out, not merely when.
+      #
+      # Cost when nothing is due: reads a JSON file, compares the clock, exits.
+      - run: python brief.py --if-due
+        env:
+          SLACK_BRIEF_WEBHOOK_URL: ${{ secrets.SLACK_BRIEF_WEBHOOK_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
       # Runs on failure too: status.json is most useful precisely when the run broke,
       # and it is the only thing that will explain why after the fact.
       - if: always()

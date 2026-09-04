@@ -4,7 +4,8 @@
     python3 brief.py --dry-run        print it, post nothing, touch no state
     python3 brief.py --dry-run --window-hours 24
     python3 brief.py --explain        show the full ranking and why each scored
-    python3 brief.py                  real run (needs SLACK_BRIEF_WEBHOOK_URL)
+    python3 brief.py                  post now, whatever the clock says
+    python3 brief.py --if-due         post only if a 6am/12pm/6pm ET edition is unsent
 
 Reads posted_log.json — what the newswire actually sent — not the Slack channel, so it
 needs no read access to anyone's workspace and cannot disagree with what was posted.
@@ -12,9 +13,11 @@ needs no read access to anyone's workspace and cannot disagree with what was pos
 Posts to its OWN webhook, a separate channel from the newswire. That separation is
 deliberate: the newswire's channel gets stories and nothing else.
 
-Runs at 6am, midday and 6pm Eastern, fired by the same Apps Script project that drives
-the newswire. The window is measured from the previous briefing rather than a fixed
-number of hours, so a missed run is covered by the next one instead of leaving a gap.
+Editions are 6am, midday and 6pm Eastern. With --if-due the check rides poll.yml's
+15-minute cadence: it asks "is an edition due and unsent?" and exits silently otherwise,
+so no separate trigger is needed. The window is measured from the previous briefing
+rather than a fixed number of hours, so a missed run is covered by the next one instead
+of leaving a gap.
 """
 from __future__ import annotations
 
@@ -60,9 +63,29 @@ def main() -> int:
     p.add_argument("--window-hours", type=float, default=None,
                    help="override the period (default: since the last briefing)")
     p.add_argument("--explain", action="store_true", help="show the full ranking")
+    p.add_argument("--if-due", action="store_true",
+                   help="post only if an edition (6am/12pm/6pm ET) is due and unsent")
     args = p.parse_args()
 
     entries = postlog.load()
+
+    # --if-due lets the briefing ride the newswire's 15-minute cadence instead of needing
+    # its own triggers. That matters because the Apps Script briefing triggers were never
+    # installed — setup ran a minute before the code containing them was pushed — so no
+    # scheduled edition ever fired, while the newswire's own trigger ran 36 times out of
+    # 40. Riding a mechanism proven to work beats adding a second one to maintain.
+    edition = None
+    if args.if_due:
+        current = brief.current_edition()
+        if current is None:
+            print("Before the first edition of the day; nothing due.")
+            return 0
+        edition, label = current
+        if postlog.edition_posted(entries, edition):
+            print(f"{edition} already posted; nothing due.")
+            return 0
+        print(f"{edition} is due.")
+
     hours = window_hours(entries, args.window_hours)
     period = postlog.since(entries, hours)
     stories = [e for e in period if e.get("kind") != "brief"]
@@ -91,7 +114,8 @@ def main() -> int:
         print("Nothing survived selection.")
         return 0
 
-    text = brief.format_brief(chosen, how, hours, len(stories))
+    label = brief.current_edition()[1] if brief.current_edition() else None
+    text = brief.format_brief(chosen, how, hours, len(stories), label=label)
     print(f"\nselection: {how}\n")
     print(text)
 
@@ -114,7 +138,7 @@ def main() -> int:
 
     # Mark it done only after Slack accepted, then commit the log so the next run — in a
     # fresh checkout — knows when this edition went out and covers the right period.
-    postlog.mark_brief(entries, len(chosen))
+    postlog.mark_brief(entries, len(chosen), edition=edition)
     postlog.save(entries)
     state.record(state.load(), files=("watcher_state.json", "status.json", "posted_log.json"))
     print(f"\nPosted {len(chosen)} item(s) by {how}.")
