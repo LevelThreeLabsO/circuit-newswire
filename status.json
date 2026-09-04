@@ -1,27 +1,28 @@
 {
-  "started_at": "2026-09-04T20:36:24+00:00",
-  "finished_at": "2026-09-04T20:36:27+00:00",
-  "duration_seconds": 3.0,
+  "started_at": "2026-09-04T20:46:23+00:00",
+  "finished_at": "2026-09-04T20:46:32+00:00",
+  "duration_seconds": 9.4,
   "dispatch_interval_seconds": 900,
   "items": {
     "fetched": 4,
     "fresh": 4,
-    "relevant": 0,
-    "unseen": 0,
-    "unique": 0
+    "relevant": 1,
+    "unseen": 1,
+    "unique": 1,
+    "posted": 1
   },
-  "posted": 0,
-  "delivered": null,
-  "last_posted_at": "2026-09-04T19:36:00+00:00",
+  "posted": 1,
+  "delivered": true,
+  "last_posted_at": "2026-09-04T20:46:32+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 100
     },
     "reuters": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 99
     },
     "thenational": {
@@ -57,7 +58,7 @@
     "nyt": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 5
+      "in_window": 4
     },
     "wam": {
       "status": "ok",
@@ -71,7 +72,7 @@
     },
     "forbesme": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 500
     },
     "meed": {
@@ -87,7 +88,7 @@
     "argaam": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 27
+      "in_window": 28
     },
     "spa": {
       "status": "ok",
@@ -97,7 +98,7 @@
     "khaleejtimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 77
+      "in_window": 76
     },
     "gulfnews": {
       "status": "ok",
@@ -157,12 +158,12 @@
     "argus": {
       "status": "ok",
       "fetched": 2,
-      "in_window": 45
+      "in_window": 42
     },
     "energyintel": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 41
+      "in_window": 40
     },
     "upstream": {
       "status": "ok",
@@ -202,60 +203,60 @@
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 47
+      "in_window": 49
     },
     "moroccoworld": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 33
+      "in_window": 32
     },
     "ahram": {
       "status": "ok",
-      "fetched": 1,
-      "in_window": 91
+      "fetched": 0,
+      "in_window": 86
     }
   },
   "consecutive_empty": {
-    "bloomberg": 6,
-    "reuters": 3,
-    "thenational": 9,
-    "agbi": 30,
-    "ft": 65,
-    "zawya": 3,
-    "arabnews": 4,
-    "wsj": 20,
-    "nyt": 19,
-    "wam": 7,
-    "arabianbusiness": 37,
-    "forbesme": 0,
-    "meed": 74,
-    "semafor": 4,
-    "argaam": 29,
-    "spa": 6,
-    "khaleejtimes": 5,
-    "gulfnews": 9,
-    "intelligenceonline": 609,
-    "peninsula": 1,
-    "q_sovereign_funds": 24,
-    "q_energy_champions": 17,
-    "q_ports_logistics": 12,
-    "q_giga_projects": 2,
-    "q_gulf_tech": 27,
-    "q_hormuz": 19,
-    "tradewinds": 26,
-    "lloydslist": 12,
+    "bloomberg": 0,
+    "reuters": 0,
+    "thenational": 10,
+    "agbi": 31,
+    "ft": 66,
+    "zawya": 4,
+    "arabnews": 5,
+    "wsj": 21,
+    "nyt": 20,
+    "wam": 8,
+    "arabianbusiness": 38,
+    "forbesme": 1,
+    "meed": 75,
+    "semafor": 5,
+    "argaam": 30,
+    "spa": 7,
+    "khaleejtimes": 6,
+    "gulfnews": 10,
+    "intelligenceonline": 610,
+    "peninsula": 2,
+    "q_sovereign_funds": 25,
+    "q_energy_champions": 18,
+    "q_ports_logistics": 13,
+    "q_giga_projects": 3,
+    "q_gulf_tech": 28,
+    "q_hormuz": 20,
+    "tradewinds": 27,
+    "lloydslist": 13,
     "argus": 0,
-    "energyintel": 2,
-    "upstream": 13,
-    "gcaptain": 14,
-    "marineinsight": 65,
-    "tradearabia": 596,
-    "saudigazette": 24,
-    "q_listings": 123,
-    "q_small_funds": 36,
-    "gulftimes": 105,
-    "moroccoworld": 2,
-    "ahram": 0
+    "energyintel": 3,
+    "upstream": 14,
+    "gcaptain": 15,
+    "marineinsight": 66,
+    "tradearabia": 597,
+    "saudigazette": 25,
+    "q_listings": 124,
+    "q_small_funds": 37,
+    "gulftimes": 106,
+    "moroccoworld": 3,
+    "ahram": 1
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
