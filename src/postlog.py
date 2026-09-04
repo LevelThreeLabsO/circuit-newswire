@@ -112,3 +112,30 @@ def last_brief_at(entries: list[dict]) -> str | None:
 
 def mark_brief(entries: list[dict], chosen: int) -> None:
     entries.append({"at": _now(), "kind": "brief", "chosen": chosen})
+
+
+def merge(a: list[dict], b: list[dict]) -> list[dict]:
+    """Union two logs, keeping the higher corroboration for a story in both.
+
+    Needed because the newswire and the briefing are separate workflows in separate
+    concurrency groups, so they can commit this file at the same moment. Without a merge
+    the loser of that race silently overwrote the winner: a simulated race lost the
+    briefing's own marker, which would make the next briefing recompute its window from
+    an older point and re-post the same five stories. The reverse case drops a story from
+    the log, so the next briefing never considers it.
+
+    Keyed on (at, url, kind): a briefing marker has no url, and two stories posted in the
+    same second from the same URL are the same entry.
+    """
+    combined: dict[tuple, dict] = {}
+    for entry in list(a) + list(b):
+        key = (entry.get("at"), entry.get("url"), entry.get("kind"))
+        existing = combined.get(key)
+        if existing is None:
+            combined[key] = dict(entry)
+            continue
+        # Corroboration is a counter each writer may have advanced independently; the
+        # higher figure is the one that saw more evidence.
+        existing["corroboration"] = max(int(existing.get("corroboration", 0)),
+                                        int(entry.get("corroboration", 0)))
+    return sorted(combined.values(), key=lambda e: e.get("at") or "")

@@ -27,6 +27,7 @@ import json
 import os
 import re
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 SHORTLIST = 15          # how many the model chooses from
 WANTED = 5
@@ -230,8 +231,15 @@ def _escape(text: str) -> str:
     return (text or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+# The desk is Eastern; the runner is UTC. `.astimezone()` with no argument converts to the
+# MACHINE's local time, so this labelled the 6am edition "Midday" and midday "Evening" in
+# the cloud — and the bug was invisible locally, because a Mac in New York gives the right
+# answer. Name the zone explicitly.
+EASTERN = ZoneInfo("America/New_York")
+
+
 def edition_label(when: datetime | None = None) -> str:
-    hour = (when or datetime.now(timezone.utc)).astimezone().hour
+    hour = (when or datetime.now(timezone.utc)).astimezone(EASTERN).hour
     if hour < 11:
         return "Morning"
     if hour < 16:

@@ -243,6 +243,12 @@ def run(args) -> int:
 
     # ---- gate 6: post ------------------------------------------------------
     if not unique:
+        # Save the log even with nothing to post: this run may still have recorded
+        # corroboration for stories posted earlier, and that is the signal the briefing
+        # ranks on most heavily. Discarding it here threw away evidence of exactly the
+        # stories several newsrooms agreed were worth filing.
+        if not args.dry_run:
+            postlog.save(log)
         print("Nothing to post.")
         _housekeeping(run_status, slack, live_state, args)
         return 0

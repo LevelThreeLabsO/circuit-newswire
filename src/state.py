@@ -235,6 +235,11 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
 
     for _ in range(5):
         _git("fetch", "-q", "origin", "main")
+        # The posted log has its own union merge — see postlog.merge. Without it the
+        # loser of a push race overwrites the winner's entries.
+        if merge_remote and "posted_log.json" in files:
+            _merge_posted_log()
+
         merged = state
         if merge_remote:
             remote = _git("show", "origin/main:watcher_state.json")
@@ -254,6 +259,20 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
         # new origin without disturbing the tree, and re-merge on the next pass.
         _git("reset", "-q", "--soft", "HEAD~1")
         _git("update-ref", "refs/heads/main", "origin/main")
+
+
+def _merge_posted_log() -> None:
+    """Union the local posted log with origin's before committing it."""
+    from . import postlog
+    remote = _git("show", "origin/main:posted_log.json")
+    if remote.returncode != 0:
+        return
+    try:
+        theirs = json.loads(remote.stdout)
+    except Exception:
+        return
+    if isinstance(theirs, list):
+        postlog.save(postlog.merge(postlog.load(), theirs))
 
 
 def _dirty_other_than(files: tuple[str, ...]) -> list[str]:
