@@ -82,10 +82,38 @@ def money_weight(title: str) -> float:
     return min(best, 50.0)
 
 
+def _dedupe(entries: list[dict]) -> list[dict]:
+    """One entry per story, keeping the highest corroboration.
+
+    The log can hold the same story twice — it did on 4 September, when a stale local run
+    reposted stories the cloud had already sent — and a briefing that listed "Hedge Funds
+    Hike Bullish Oil Bets" as items 1 and 2 was the visible result. Keyed on URL and on the
+    stemmed headline, so a reissue on a new link is also caught.
+    """
+    by_key: dict[str, dict] = {}
+    for e in entries:
+        keys = [e.get("url") or "", " ".join(e.get("words") or [])]
+        hit = next((by_key[k] for k in keys if k and k in by_key), None)
+        if hit is None:
+            entry = dict(e)
+            for k in keys:
+                if k:
+                    by_key[k] = entry
+            continue
+        hit["corroboration"] = max(int(hit.get("corroboration", 0)), int(e.get("corroboration", 0)))
+    seen_ids: set[int] = set()
+    out = []
+    for entry in by_key.values():
+        if id(entry) not in seen_ids:
+            seen_ids.add(id(entry))
+            out.append(entry)
+    return out
+
+
 def rank(entries: list[dict]) -> list[dict]:
     """Order the period's stories by weight. Highest first."""
     scored = []
-    for e in entries:
+    for e in _dedupe(entries):
         if e.get("kind") == "brief":
             continue
         title = e.get("title") or ""

@@ -276,6 +276,12 @@ _SPAM_TITLE = re.compile(
 # in it.
 _STYLED_UNICODE = re.compile(r"[\uFF01-\uFF5E\U0001D400-\U0001D7FF]")
 
+# A scoreline — "2-1 victory", "beat X 3-0", "1-1 draw" — is a match report. The word
+# "port" in a club name is what let one through the business filter.
+_SCORELINE = re.compile(r"\b\d{1,2}\s?[-–]\s?\d{1,2}\s+(?:win|victory|draw|defeat|loss|thriller)\b"
+                        r"|\b(?:beat|beats|defeats?|thrash(?:es)?)\s+[A-Z][\w\s]{2,25}\s\d{1,2}\s?[-–]\s?\d{1,2}\b",
+                        re.IGNORECASE)
+
 # Symbol soup: "%**(Today===)", "~!!【OffiCial】", "+++【FIFA![LIVES'TREAMs!SKY+TV]".
 _SYMBOL_SOUP = re.compile(r"[\[\]{}【】!@#~%*+=|]{3,}")
 
@@ -298,7 +304,8 @@ def looks_like_spam(title: str) -> bool:
     cannot catch them and this has to.
     """
     if (_SPAM_TITLE.search(title) or _STYLED_UNICODE.search(title)
-            or _SYMBOL_SOUP.search(title) or _FIXTURE.search(title)):
+            or _SYMBOL_SOUP.search(title) or _FIXTURE.search(title)
+            or _SCORELINE.search(title)):
         return True
     match = _SPAM_TOKEN.search(title)
     if not match:

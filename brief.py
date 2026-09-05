@@ -33,6 +33,24 @@ from src.slack_client import DeliveryError, SlackClient
 
 load_dotenv()
 
+
+def _refuse_local_live(args) -> None:
+    """Live posting is the cloud's job. One writer, one clock.
+
+    Every duplicate the channel received on 4 September traced to a live run from a
+    laptop: 25 state commits that day carried a -04:00 committer offset, and each one wrote
+    a stale local view of the dedup store over origin's, so stories the cloud had already
+    posted looked new and went out again. Claim-before-send cannot protect two writers
+    whose only channel is a git push landing seconds later. So a live run outside GitHub
+    Actions is refused unless explicitly forced — and --dry-run needs nothing.
+    """
+    if getattr(args, "dry_run", False):
+        return
+    if os.environ.get("GITHUB_ACTIONS") == "true" or getattr(args, "allow_local", False):
+        return
+    sys.exit("Refusing a LIVE run outside GitHub Actions: a second writer reposts what the "
+             "cloud already sent. Use --dry-run, or --allow-local if you truly mean it.")
+
 # Used only when there is no record of a previous briefing (the first run, or a fresh
 # clone). Slightly more than the longest gap between editions — 6pm to 6am — so the first
 # briefing has a full period to work with rather than a sliver.
@@ -63,9 +81,12 @@ def main() -> int:
     p.add_argument("--window-hours", type=float, default=None,
                    help="override the period (default: since the last briefing)")
     p.add_argument("--explain", action="store_true", help="show the full ranking")
+    p.add_argument("--allow-local", action="store_true",
+                   help="permit a LIVE run outside GitHub Actions (normally refused)")
     p.add_argument("--if-due", action="store_true",
                    help="post only if an edition (6am/12pm/6pm ET) is due and unsent")
     args = p.parse_args()
+    _refuse_local_live(args)
 
     entries = postlog.load()
 

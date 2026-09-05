@@ -36,6 +36,7 @@ replacement then turned away two scheduled runs.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -48,6 +49,24 @@ from src.score import Scorer
 from src.slack_client import DeliveryError, SlackClient
 
 load_dotenv()
+
+
+def _refuse_local_live(args) -> None:
+    """Live posting is the cloud's job. One writer, one clock.
+
+    Every duplicate the channel received on 4 September traced to a live run from a
+    laptop: 25 state commits that day carried a -04:00 committer offset, and each one wrote
+    a stale local view of the dedup store over origin's, so stories the cloud had already
+    posted looked new and went out again. Claim-before-send cannot protect two writers
+    whose only channel is a git push landing seconds later. So a live run outside GitHub
+    Actions is refused unless explicitly forced — and --dry-run needs nothing.
+    """
+    if getattr(args, "dry_run", False):
+        return
+    if os.environ.get("GITHUB_ACTIONS") == "true" or getattr(args, "allow_local", False):
+        return
+    sys.exit("Refusing a LIVE run outside GitHub Actions: a second writer reposts what the "
+             "cloud already sent. Use --dry-run, or --allow-local if you truly mean it.")
 
 ROOT = Path(__file__).resolve().parent
 SOURCES_FILE = ROOT / "sources.yaml"
@@ -345,7 +364,31 @@ def cmd_test_webhook() -> int:
     return 0
 
 
+def _merge_regression() -> str | None:
+    """state.merge() must union two states that both remember headlines.
+
+    This bug shipped twice. The list-in-a-dict-key TypeError was swallowed by both
+    callers, so the failure was invisible until stories the cloud had posted came out
+    again from a local run. A selftest failure is the alarm that was missing.
+    """
+    a, b = state.blank(), state.blank()
+    state.claim(a, ["u:A"]); state.remember_title(a, ["aramco", "gas"], "Reuters")
+    state.claim(b, ["u:B"]); state.remember_title(b, ["adnoc", "ship"], "AGBI")
+    try:
+        m = state.merge(a, b)
+    except Exception as e:  # noqa: BLE001
+        return f"state.merge() raised {type(e).__name__}: {e}"
+    if set(m["seen"]) != {"u:A", "u:B"} or len(m["titles"]) != 2:
+        return f"state.merge() lost data: seen={sorted(m['seen'])} titles={len(m['titles'])}"
+    return None
+
+
 def cmd_selftest() -> int:
+    problem = _merge_regression()
+    if problem:
+        print(f"FAIL   {problem}")
+        return 1
+    print("ok     state.merge() unions two states with remembered headlines")
     from tests.selftest import main as selftest_main
     return selftest_main()
 
@@ -364,6 +407,8 @@ def main() -> int:
     p.add_argument("--max-items", type=int, default=None, help="override the digest cap")
     p.add_argument("--reset", action="store_true",
                    help="clear state and re-baseline: only stories newer than now will post")
+    p.add_argument("--allow-local", action="store_true",
+                   help="permit a LIVE run outside GitHub Actions (normally refused)")
     p.add_argument("--backfill", action="store_true",
                    help="post what a baseline claimed but never showed (see gate 4)")
     p.add_argument("--status", action="store_true", help="print status.json and exit")
@@ -383,6 +428,7 @@ def main() -> int:
         return cmd_selftest()
     if args.audit:
         return cmd_audit(args)
+    _refuse_local_live(args)
 
     # Any unhandled failure must still leave a status record, or the file keeps showing
     # the last good run and the watcher looks healthy while it is broken — the precise

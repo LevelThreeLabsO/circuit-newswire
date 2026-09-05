@@ -136,7 +136,16 @@ def merge(a: dict, b: dict) -> dict:
         for k, v in b.get(store, {}).items():
             if k not in out[store] or v < out[store][k]:
                 out[store][k] = v
-    combined = {(t.get("at"), t.get("words")): t for t in a.get("titles", []) + b.get("titles", [])}
+    # tuple(words), NOT words. `words` is a list and a list inside a dict key raises
+    # TypeError. This exact bug was fixed once, lost in a stash during a push conflict, and
+    # shipped again — during which every call to merge() raised, both callers swallowed
+    # it, latest() fell back to the stale LOCAL state, and a local run reposted stories
+    # the cloud had already sent. The regression check in poll.py --selftest now fails
+    # loudly if this line ever reverts.
+    combined = {
+        (t.get("at"), tuple(t.get("words") or ())): t
+        for t in a.get("titles", []) + b.get("titles", [])
+    }
     out["titles"] = sorted(combined.values(), key=lambda t: t.get("at", ""))[-TITLE_MAX:]
     return out
 
@@ -204,7 +213,11 @@ def latest() -> dict:
         return local
     try:
         return merge(local, _coerce(json.loads(r.stdout)))
-    except Exception:
+    except Exception as e:  # noqa: BLE001
+        # Loud. A silent fall-through here is how a broken merge() went unnoticed while it
+        # let local runs repost the cloud's stories.
+        print(f"  ! state.latest(): merge with origin failed ({type(e).__name__}: {e}); "
+              "using LOCAL state only — reposts are possible", file=__import__("sys").stderr)
         return local
 
 
@@ -246,8 +259,10 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
             if remote.returncode == 0:
                 try:
                     merged = merge(state, _coerce(json.loads(remote.stdout)))
-                except Exception:
-                    pass
+                except Exception as e:  # noqa: BLE001
+                    print(f"  ! state.record(): merge with origin failed ({type(e).__name__}: "
+                          f"{e}); committing LOCAL state — origin's claims may be lost",
+                          file=__import__("sys").stderr)
         save(merged)
         _git("add", *files)
         if _git("diff", "--cached", "--quiet").returncode == 0:

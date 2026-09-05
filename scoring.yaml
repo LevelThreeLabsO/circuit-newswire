@@ -720,7 +720,6 @@ noise:
   - what to know
   - match preview
   - transfer window
-  - kick-off
   - live score
   - full-time
   - Premier League
@@ -749,6 +748,28 @@ noise:
   - booking code
   - Pro League
   - Prof. League
+  # Match reports. "Zamalek kick off Champions League campaign with 2-1 victory over AS
+  # Port" reached the channel: Egyptian (geography) plus the club name "Port" (shipping
+  # vocabulary) made 4. Competition names and result phrasing are vetoed; club names and
+  # "kick off" are NOT — PIF owns Al Hilal, the Esports World Cup "kicks off", and those
+  # are Circuit stories. Scorelines ("2-1 victory") are caught separately in fetch.py.
+  - Champions League
+  - Europa League
+  - Premier League
+  - victory over
+  - defeat to
+  - draw with
+  - Egyptian Football
+  # Military action without a business angle. "strikes" was removed from the sector
+  # list — labour strikes are rare on this beat and airstrikes are not, so it admitted
+  # "Israel says it strikes southern Lebanon after Hezbollah drone launch" at 7.
+  - drone launch
+  - airstrike
+  - air strike
+  - strikes southern
+  - strikes northern
+  - strikes eastern
+  - ground offensive
   - bet on
   - betting odds
   - odds
