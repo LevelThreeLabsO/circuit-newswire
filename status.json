@@ -1,19 +1,19 @@
 {
-  "started_at": "2026-09-07T03:16:26+00:00",
-  "finished_at": "2026-09-07T03:16:31+00:00",
-  "duration_seconds": 4.9,
+  "started_at": "2026-09-07T03:31:28+00:00",
+  "finished_at": "2026-09-07T03:31:32+00:00",
+  "duration_seconds": 4.7,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 11,
-    "fresh": 11,
-    "relevant": 4,
-    "unseen": 1,
-    "unique": 1,
-    "posted": 1
+    "fetched": 6,
+    "fresh": 6,
+    "relevant": 3,
+    "unseen": 2,
+    "unique": 2,
+    "posted": 2
   },
-  "posted": 1,
+  "posted": 2,
   "delivered": true,
-  "last_posted_at": "2026-09-07T03:16:31+00:00",
+  "last_posted_at": "2026-09-07T03:31:32+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
@@ -23,11 +23,11 @@
     "reuters": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 20
+      "in_window": 21
     },
     "thenational": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 11
     },
     "agbi": {
@@ -42,8 +42,8 @@
     },
     "zawya": {
       "status": "ok",
-      "fetched": 7,
-      "in_window": 17
+      "fetched": 5,
+      "in_window": 18
     },
     "arabnews": {
       "status": "ok",
@@ -93,7 +93,7 @@
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 21
+      "in_window": 20
     },
     "khaleejtimes": {
       "status": "ok",
@@ -103,7 +103,7 @@
     "gulfnews": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 99
+      "in_window": 98
     },
     "intelligenceonline": {
       "status": "ok",
@@ -112,7 +112,7 @@
     },
     "peninsula": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 70
     },
     "q_sovereign_funds": {
@@ -142,7 +142,7 @@
     },
     "q_hormuz": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 100
     },
     "tradewinds": {
@@ -203,7 +203,7 @@
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 66
+      "in_window": 64
     },
     "moroccoworld": {
       "status": "ok",
@@ -217,46 +217,46 @@
     }
   },
   "consecutive_empty": {
-    "bloomberg": 21,
-    "reuters": 6,
-    "thenational": 0,
-    "agbi": 13,
-    "ft": 37,
+    "bloomberg": 22,
+    "reuters": 7,
+    "thenational": 1,
+    "agbi": 14,
+    "ft": 38,
     "zawya": 0,
-    "arabnews": 11,
-    "wsj": 8,
-    "nyt": 191,
-    "wam": 13,
-    "arabianbusiness": 52,
-    "forbesme": 46,
-    "meed": 302,
-    "semafor": 19,
-    "argaam": 39,
-    "spa": 8,
-    "khaleejtimes": 4,
+    "arabnews": 12,
+    "wsj": 9,
+    "nyt": 192,
+    "wam": 14,
+    "arabianbusiness": 53,
+    "forbesme": 47,
+    "meed": 303,
+    "semafor": 20,
+    "argaam": 40,
+    "spa": 9,
+    "khaleejtimes": 5,
     "gulfnews": 0,
-    "intelligenceonline": 837,
-    "peninsula": 0,
-    "q_sovereign_funds": 48,
-    "q_energy_champions": 35,
-    "q_ports_logistics": 153,
-    "q_giga_projects": 13,
-    "q_gulf_tech": 197,
-    "q_hormuz": 0,
-    "tradewinds": 5,
-    "lloydslist": 240,
-    "argus": 40,
-    "energyintel": 222,
-    "upstream": 2,
-    "gcaptain": 19,
-    "marineinsight": 145,
-    "tradearabia": 824,
-    "saudigazette": 42,
-    "q_listings": 31,
-    "q_small_funds": 264,
-    "gulftimes": 333,
-    "moroccoworld": 26,
-    "ahram": 26
+    "intelligenceonline": 838,
+    "peninsula": 1,
+    "q_sovereign_funds": 49,
+    "q_energy_champions": 36,
+    "q_ports_logistics": 154,
+    "q_giga_projects": 14,
+    "q_gulf_tech": 198,
+    "q_hormuz": 1,
+    "tradewinds": 6,
+    "lloydslist": 241,
+    "argus": 41,
+    "energyintel": 223,
+    "upstream": 3,
+    "gcaptain": 20,
+    "marineinsight": 146,
+    "tradearabia": 825,
+    "saudigazette": 43,
+    "q_listings": 32,
+    "q_small_funds": 265,
+    "gulftimes": 334,
+    "moroccoworld": 27,
+    "ahram": 27
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
@@ -306,6 +306,7 @@
     "intelligenceonline",
     "lloydslist",
     "meed",
+    "nyt",
     "q_gulf_tech",
     "q_small_funds",
     "tradearabia"
