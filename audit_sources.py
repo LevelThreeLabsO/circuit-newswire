@@ -25,6 +25,7 @@ Read the columns, not the exit code:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -61,6 +62,20 @@ def audit_one(source: dict) -> dict:
     try:
         if source["method"] == "rss":
             url = source["url"]
+        elif source["method"] == "html":
+            # An institutional listing page: healthy means it answers and still contains
+            # announcement links matching the configured pattern. Site redesigns break the
+            # pattern silently — the page keeps returning 200 with zero matches.
+            page = _get(source["url"]).text
+            links = list(dict.fromkeys(re.findall(source["link_pattern"], page)))
+            out["entries"] = len(links)
+            if not links:
+                out["verdict"] = "NOT A FEED"
+                out["detail"] = "listing page answered but matched no announcement links"
+            else:
+                out["verdict"] = "ok"
+                out["detail"] = f"{len(links)} announcement links (undated by design)"
+            return out
         else:
             # Built by the same function the fetcher uses — see build_query's docstring.
             query, _ = build_query(source)
