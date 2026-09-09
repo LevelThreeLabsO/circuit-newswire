@@ -155,19 +155,6 @@ def run(args) -> int:
         print(f"Reset — baselined {len(candidates)} items from a clean slate.")
         return 0
 
-    # ---- baseline one source: for undated (html) sources being added -----------
-    # Their items age from first sighting, so on the first live run every announcement
-    # currently on the listing page looks brand new. Claim them silently instead.
-    if args.baseline_source and not args.dry_run:
-        wanted = set(args.baseline_source)
-        live_state = state.latest()
-        keys = [k for item in candidates if item.source_key in wanted
-                for k in dedup.keys_for(item)]
-        state.claim(live_state, keys)
-        state.record(live_state)
-        print(f"Baselined {len(keys) // 2} item(s) from {', '.join(sorted(wanted))}; nothing posted.")
-        return 0
-
     # ---- first run: baseline silently rather than dumping the backlog -------
     live_state = state.blank() if args.dry_run else state.latest()
     if not args.dry_run and not state.exists():
@@ -418,9 +405,6 @@ def main() -> int:
     p.add_argument("--window-hours", type=float, default=None, help="override every source's window")
     p.add_argument("--source", action="append", help="limit to source key(s); repeatable")
     p.add_argument("--max-items", type=int, default=None, help="override the digest cap")
-    p.add_argument("--baseline-source", action="append", metavar="KEY",
-                   help="claim a source's current items as seen without posting — run once "
-                        "when adding an undated (html) source, or its whole listing posts")
     p.add_argument("--reset", action="store_true",
                    help="clear state and re-baseline: only stories newer than now will post")
     p.add_argument("--allow-local", action="store_true",
