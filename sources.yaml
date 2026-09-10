@@ -434,13 +434,17 @@ sources:
     title_strip: ["ADGM"]
     threshold: 4
 
+  # DIFC's listing page (difc.com/whats-on/news) is on Vercel, which returns HTTP 429 to
+  # GitHub's runners on every run while answering a laptop with 200. A persistent block on
+  # datacenter IPs, not a transient limit — confirmed across two days. Google indexes only
+  # a handful of DIFC items a month, so this route is thin, but it is the one that works
+  # from the cloud. Revisit if DIFC ever publishes a feed.
   - key: difc
     outlet: DIFC
     desk: Dubai financial centre
-    method: html
-    url: "https://www.difc.com/whats-on/news"
-    link_pattern: 'href="(https?://www\.difc\.com/whats-on/news/[^"#?]+|/whats-on/news/[^"#?]+)"'
-    title_strip: ["DIFC"]
+    method: gnews
+    url: difc.com
+    publisher: [DIFC, Dubai International Financial Centre, difc.com]
     threshold: 4
 
   - key: dfsa
