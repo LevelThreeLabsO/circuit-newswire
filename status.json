@@ -1,18 +1,19 @@
 {
-  "started_at": "2026-09-12T18:31:22+00:00",
-  "finished_at": "2026-09-12T18:31:39+00:00",
-  "duration_seconds": 16.9,
+  "started_at": "2026-09-12T18:46:07+00:00",
+  "finished_at": "2026-09-12T18:46:29+00:00",
+  "duration_seconds": 21.7,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 24,
-    "fresh": 11,
-    "relevant": 0,
-    "unseen": 0,
-    "unique": 0
+    "fetched": 20,
+    "fresh": 7,
+    "relevant": 1,
+    "unseen": 1,
+    "unique": 1,
+    "posted": 1
   },
-  "posted": 0,
-  "delivered": null,
-  "last_posted_at": "2026-09-12T17:31:45+00:00",
+  "posted": 1,
+  "delivered": true,
+  "last_posted_at": "2026-09-12T18:46:29+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
@@ -21,7 +22,7 @@
     },
     "reuters": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 100
     },
     "thenational": {
@@ -42,7 +43,7 @@
     "zawya": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 10
+      "in_window": 9
     },
     "arabnews": {
       "status": "ok",
@@ -52,7 +53,7 @@
     "wsj": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 16
+      "in_window": 15
     },
     "nyt": {
       "status": "ok",
@@ -62,7 +63,7 @@
     "wam": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 53
+      "in_window": 51
     },
     "arabianbusiness": {
       "status": "ok",
@@ -87,22 +88,22 @@
     "argaam": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 13
+      "in_window": 14
     },
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 21
+      "in_window": 24
     },
     "khaleejtimes": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 67
+      "fetched": 1,
+      "in_window": 70
     },
     "gulfnews": {
       "status": "ok",
-      "fetched": 4,
-      "in_window": 79
+      "fetched": 3,
+      "in_window": 78
     },
     "intelligenceonline": {
       "status": "ok",
@@ -112,7 +113,7 @@
     "peninsula": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 45
+      "in_window": 46
     },
     "q_sovereign_funds": {
       "status": "ok",
@@ -162,7 +163,7 @@
     "energyintel": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 22
+      "in_window": 20
     },
     "upstream": {
       "status": "ok",
@@ -182,11 +183,11 @@
     "tradearabia": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 14
+      "in_window": 15
     },
     "saudigazette": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 50
     },
     "q_listings": {
@@ -202,12 +203,12 @@
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 57
+      "in_window": 59
     },
     "moroccoworld": {
       "status": "ok",
-      "fetched": 2,
-      "in_window": 41
+      "fetched": 0,
+      "in_window": 42
     },
     "ahram": {
       "status": "ok",
@@ -241,51 +242,51 @@
     }
   },
   "consecutive_empty": {
-    "bloomberg": 2,
-    "reuters": 0,
-    "thenational": 41,
-    "agbi": 50,
-    "ft": 30,
-    "zawya": 4,
-    "arabnews": 8,
-    "wsj": 3,
-    "nyt": 110,
-    "wam": 3,
-    "arabianbusiness": 24,
-    "forbesme": 6,
-    "meed": 126,
-    "semafor": 107,
-    "argaam": 23,
-    "spa": 3,
-    "khaleejtimes": 2,
+    "bloomberg": 3,
+    "reuters": 1,
+    "thenational": 42,
+    "agbi": 51,
+    "ft": 31,
+    "zawya": 5,
+    "arabnews": 9,
+    "wsj": 4,
+    "nyt": 111,
+    "wam": 4,
+    "arabianbusiness": 25,
+    "forbesme": 7,
+    "meed": 127,
+    "semafor": 108,
+    "argaam": 24,
+    "spa": 4,
+    "khaleejtimes": 0,
     "gulfnews": 0,
-    "intelligenceonline": 1416,
+    "intelligenceonline": 1417,
     "peninsula": 0,
-    "q_sovereign_funds": 25,
-    "q_energy_champions": 92,
-    "q_ports_logistics": 56,
-    "q_giga_projects": 6,
-    "q_gulf_tech": 7,
-    "q_hormuz": 16,
-    "tradewinds": 79,
-    "lloydslist": 82,
-    "argus": 83,
-    "energyintel": 86,
-    "upstream": 25,
-    "gcaptain": 193,
-    "marineinsight": 7,
-    "tradearabia": 1403,
-    "saudigazette": 0,
-    "q_listings": 425,
-    "q_small_funds": 202,
-    "gulftimes": 296,
-    "moroccoworld": 0,
+    "q_sovereign_funds": 26,
+    "q_energy_champions": 93,
+    "q_ports_logistics": 57,
+    "q_giga_projects": 7,
+    "q_gulf_tech": 8,
+    "q_hormuz": 17,
+    "tradewinds": 80,
+    "lloydslist": 83,
+    "argus": 84,
+    "energyintel": 87,
+    "upstream": 26,
+    "gcaptain": 194,
+    "marineinsight": 8,
+    "tradearabia": 1404,
+    "saudigazette": 1,
+    "q_listings": 426,
+    "q_small_funds": 203,
+    "gulftimes": 297,
+    "moroccoworld": 1,
     "ahram": 0,
     "adgm": 0,
-    "difc": 320,
+    "difc": 321,
     "dfsa": 0,
-    "admediaoffice": 150,
-    "dubaimediaoffice": 9
+    "admediaoffice": 151,
+    "dubaimediaoffice": 10
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
