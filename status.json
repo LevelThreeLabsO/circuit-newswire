@@ -1,11 +1,11 @@
 {
-  "started_at": "2026-09-20T04:31:22+00:00",
-  "finished_at": "2026-09-20T04:31:41+00:00",
-  "duration_seconds": 19.3,
+  "started_at": "2026-09-20T04:46:26+00:00",
+  "finished_at": "2026-09-20T04:46:43+00:00",
+  "duration_seconds": 16.9,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 18,
-    "fresh": 6,
+    "fetched": 14,
+    "fresh": 2,
     "relevant": 0,
     "unseen": 0,
     "unique": 0
@@ -17,16 +17,16 @@
     "bloomberg": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 78
+      "in_window": 82
     },
     "reuters": {
       "status": "ok",
-      "fetched": 1,
-      "in_window": 84
+      "fetched": 0,
+      "in_window": 82
     },
     "thenational": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 19
     },
     "agbi": {
@@ -42,7 +42,7 @@
     "zawya": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 14
+      "in_window": 15
     },
     "arabnews": {
       "status": "ok",
@@ -52,7 +52,7 @@
     "wsj": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 4
+      "in_window": 3
     },
     "nyt": {
       "status": "ok",
@@ -87,21 +87,21 @@
     "argaam": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 7
+      "in_window": 8
     },
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 17
+      "in_window": 16
     },
     "khaleejtimes": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 37
+      "in_window": 35
     },
     "gulfnews": {
       "status": "ok",
-      "fetched": 3,
+      "fetched": 1,
       "in_window": 76
     },
     "intelligenceonline": {
@@ -167,7 +167,7 @@
     "upstream": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 2
+      "in_window": 1
     },
     "gcaptain": {
       "status": "ok",
@@ -182,7 +182,7 @@
     "tradearabia": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 13
+      "in_window": 11
     },
     "saudigazette": {
       "status": "ok",
@@ -241,51 +241,51 @@
     }
   },
   "consecutive_empty": {
-    "bloomberg": 5,
-    "reuters": 0,
-    "thenational": 0,
-    "agbi": 170,
-    "ft": 1,
-    "zawya": 49,
-    "arabnews": 14,
-    "wsj": 30,
-    "nyt": 83,
-    "wam": 17,
-    "arabianbusiness": 78,
-    "forbesme": 77,
-    "meed": 168,
-    "semafor": 132,
-    "argaam": 68,
-    "spa": 173,
+    "bloomberg": 6,
+    "reuters": 1,
+    "thenational": 1,
+    "agbi": 171,
+    "ft": 2,
+    "zawya": 50,
+    "arabnews": 15,
+    "wsj": 31,
+    "nyt": 84,
+    "wam": 18,
+    "arabianbusiness": 79,
+    "forbesme": 78,
+    "meed": 169,
+    "semafor": 133,
+    "argaam": 69,
+    "spa": 174,
     "khaleejtimes": 0,
     "gulfnews": 0,
-    "intelligenceonline": 2169,
-    "peninsula": 6,
-    "q_sovereign_funds": 80,
-    "q_energy_champions": 47,
-    "q_ports_logistics": 78,
-    "q_giga_projects": 7,
-    "q_gulf_tech": 80,
-    "q_hormuz": 52,
-    "tradewinds": 14,
-    "lloydslist": 126,
-    "argus": 42,
-    "energyintel": 98,
-    "upstream": 11,
-    "gcaptain": 3,
-    "marineinsight": 77,
-    "tradearabia": 2156,
-    "saudigazette": 46,
-    "q_listings": 227,
-    "q_small_funds": 485,
-    "gulftimes": 31,
-    "moroccoworld": 9,
-    "ahram": 27,
+    "intelligenceonline": 2170,
+    "peninsula": 7,
+    "q_sovereign_funds": 81,
+    "q_energy_champions": 48,
+    "q_ports_logistics": 79,
+    "q_giga_projects": 8,
+    "q_gulf_tech": 81,
+    "q_hormuz": 53,
+    "tradewinds": 15,
+    "lloydslist": 127,
+    "argus": 43,
+    "energyintel": 99,
+    "upstream": 12,
+    "gcaptain": 4,
+    "marineinsight": 78,
+    "tradearabia": 2157,
+    "saudigazette": 47,
+    "q_listings": 228,
+    "q_small_funds": 486,
+    "gulftimes": 32,
+    "moroccoworld": 10,
+    "ahram": 28,
     "adgm": 0,
-    "difc": 1073,
-    "dfsa": 682,
-    "admediaoffice": 191,
-    "dubaimediaoffice": 45
+    "difc": 1074,
+    "dfsa": 683,
+    "admediaoffice": 192,
+    "dubaimediaoffice": 46
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
@@ -335,6 +335,7 @@
     "difc": 0
   },
   "stale_sources": [
+    "admediaoffice",
     "dfsa",
     "difc",
     "intelligenceonline",
