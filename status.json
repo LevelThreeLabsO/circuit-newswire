@@ -1,11 +1,11 @@
 {
-  "started_at": "2026-09-28T00:01:24+00:00",
-  "finished_at": "2026-09-28T00:01:41+00:00",
-  "duration_seconds": 16.8,
+  "started_at": "2026-09-28T00:16:21+00:00",
+  "finished_at": "2026-09-28T00:16:37+00:00",
+  "duration_seconds": 15.9,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 2,
-    "fresh": 1,
+    "fetched": 8,
+    "fresh": 7,
     "relevant": 0,
     "unseen": 0,
     "unique": 0
@@ -16,8 +16,8 @@
   "sources": {
     "bloomberg": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 39
+      "fetched": 1,
+      "in_window": 41
     },
     "reuters": {
       "status": "ok",
@@ -41,8 +41,8 @@
     },
     "zawya": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 22
+      "fetched": 1,
+      "in_window": 23
     },
     "arabnews": {
       "status": "ok",
@@ -61,8 +61,8 @@
     },
     "wam": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 63
+      "fetched": 1,
+      "in_window": 64
     },
     "arabianbusiness": {
       "status": "ok",
@@ -92,7 +92,7 @@
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 28
+      "in_window": 27
     },
     "khaleejtimes": {
       "status": "ok",
@@ -101,8 +101,8 @@
     },
     "gulfnews": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 97
+      "fetched": 1,
+      "in_window": 99
     },
     "intelligenceonline": {
       "status": "ok",
@@ -111,7 +111,7 @@
     },
     "peninsula": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 92
     },
     "q_sovereign_funds": {
@@ -156,8 +156,8 @@
     },
     "argus": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 1
+      "fetched": 1,
+      "in_window": 2
     },
     "energyintel": {
       "status": "ok",
@@ -182,7 +182,7 @@
     "tradearabia": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 61
+      "in_window": 59
     },
     "saudigazette": {
       "status": "ok",
@@ -241,51 +241,51 @@
     }
   },
   "consecutive_empty": {
-    "bloomberg": 1,
-    "reuters": 2,
-    "thenational": 52,
-    "agbi": 255,
-    "ft": 27,
-    "zawya": 39,
-    "arabnews": 16,
-    "wsj": 14,
-    "nyt": 23,
-    "wam": 1,
-    "arabianbusiness": 73,
-    "forbesme": 33,
-    "meed": 257,
+    "bloomberg": 0,
+    "reuters": 3,
+    "thenational": 53,
+    "agbi": 256,
+    "ft": 28,
+    "zawya": 0,
+    "arabnews": 17,
+    "wsj": 15,
+    "nyt": 24,
+    "wam": 0,
+    "arabianbusiness": 74,
+    "forbesme": 34,
+    "meed": 258,
     "semafor": 0,
-    "argaam": 30,
-    "spa": 22,
-    "khaleejtimes": 13,
-    "gulfnews": 1,
-    "intelligenceonline": 2960,
-    "peninsula": 8,
-    "q_sovereign_funds": 55,
-    "q_energy_champions": 67,
-    "q_ports_logistics": 176,
-    "q_giga_projects": 16,
-    "q_gulf_tech": 67,
-    "q_hormuz": 3,
-    "tradewinds": 11,
-    "lloydslist": 203,
-    "argus": 214,
-    "energyintel": 209,
-    "upstream": 64,
-    "gcaptain": 18,
-    "marineinsight": 152,
-    "tradearabia": 2947,
-    "saudigazette": 32,
-    "q_listings": 21,
-    "q_small_funds": 262,
-    "gulftimes": 114,
-    "moroccoworld": 8,
-    "ahram": 20,
+    "argaam": 31,
+    "spa": 23,
+    "khaleejtimes": 14,
+    "gulfnews": 0,
+    "intelligenceonline": 2961,
+    "peninsula": 0,
+    "q_sovereign_funds": 56,
+    "q_energy_champions": 68,
+    "q_ports_logistics": 177,
+    "q_giga_projects": 17,
+    "q_gulf_tech": 68,
+    "q_hormuz": 4,
+    "tradewinds": 12,
+    "lloydslist": 204,
+    "argus": 0,
+    "energyintel": 210,
+    "upstream": 65,
+    "gcaptain": 19,
+    "marineinsight": 153,
+    "tradearabia": 2948,
+    "saudigazette": 33,
+    "q_listings": 22,
+    "q_small_funds": 263,
+    "gulftimes": 115,
+    "moroccoworld": 9,
+    "ahram": 21,
     "adgm": 0,
-    "difc": 1864,
-    "dfsa": 155,
-    "admediaoffice": 51,
-    "dubaimediaoffice": 162
+    "difc": 1865,
+    "dfsa": 156,
+    "admediaoffice": 52,
+    "dubaimediaoffice": 163
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
@@ -336,7 +336,6 @@
   },
   "stale_sources": [
     "agbi",
-    "argus",
     "difc",
     "energyintel",
     "intelligenceonline",
