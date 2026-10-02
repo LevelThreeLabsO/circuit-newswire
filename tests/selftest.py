@@ -36,6 +36,18 @@ NEGATIVE = HERE / "headlines_negative.txt"
 MIN_RECALL = 0.80
 MAX_NOISE = 0.12
 
+# The positive fixtures are The Circuit's own headlines from August 2026 — a month the
+# Iran war dominated. On 1 October the desk said that oil-and-politics mix is precisely
+# what they do NOT want ("companies, companies, companies, and people — that's the
+# stuff"), so the scorer now demotes it on purpose. Recall is reported on all positives
+# and on the non-geopolitics ones; the gate applies to the latter, because a drop in the
+# former is the intended effect of the change, not a regression.
+import re
+_GEOPOLITICS = re.compile(
+    r"\b(oil|crude|OPEC|Brent|barrel|Hormuz|Iran|Iranian|Tehran|Israel|Gaza|Hezbollah|"
+    r"Houthi|missile|strike|strikes|war|ceasefire|sanction\w*|talks|tanker|Red Sea|"
+    r"military|navy|blockade)\b", re.IGNORECASE)
+
 
 def _load(path: Path) -> list[str]:
     if not path.exists():
@@ -61,13 +73,18 @@ def main() -> int:
     kept = [(t, v[1]) for t, v in hits if v[0]]
     missed = [(t, v[1]) for t, v in hits if not v[0]]
     recall = len(kept) / len(positives)
+    core = [(t, v) for t, v in hits if not _GEOPOLITICS.search(t)]
+    core_kept = [1 for t, v in core if v[0]]
+    core_recall = len(core_kept) / max(len(core), 1)
 
     nhits = [(t, admits(t)) for t in negatives]
     false_pass = [(t, v[1]) for t, v in nhits if v[0]]
     noise = len(false_pass) / len(negatives)
 
-    print(f"recall   {len(kept):3}/{len(positives):3} = {recall:5.1%}  "
-          f"(gate {MIN_RECALL:.0%}) — real Circuit stories admitted")
+    print(f"recall   {len(core_kept):3}/{len(core):3} = {core_recall:5.1%}  "
+          f"(gate {MIN_RECALL:.0%}) — Circuit stories admitted, excluding oil/geopolitics")
+    print(f"         {len(kept):3}/{len(positives):3} = {recall:5.1%}  "
+          f"— all positives (oil/geopolitics demoted on purpose since 2026-10-01)")
     print(f"noise    {len(false_pass):3}/{len(negatives):3} = {noise:5.1%}  "
           f"(gate {MAX_NOISE:.0%}) — tabloid/off-beat headlines admitted")
 
@@ -87,7 +104,7 @@ def main() -> int:
         if len(false_pass) > 20:
             print(f"  … and {len(false_pass) - 20} more")
 
-    ok = recall >= MIN_RECALL and noise <= MAX_NOISE
+    ok = core_recall >= MIN_RECALL and noise <= MAX_NOISE
     print(f"\n{'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
 

@@ -82,32 +82,44 @@ def money_weight(title: str) -> float:
     return min(best, 50.0)
 
 
+def _overlap(a: list[str], b: list[str]) -> float:
+    """Shared fraction of the shorter word-set — the newswire's own cross-outlet measure."""
+    if len(a) < 3 or len(b) < 3:
+        return 0.0
+    return len(set(a) & set(b)) / min(len(a), len(b))
+
+
 def _dedupe(entries: list[dict]) -> list[dict]:
     """One entry per story, keeping the highest corroboration.
 
-    The log can hold the same story twice — it did on 4 September, when a stale local run
-    reposted stories the cloud had already sent — and a briefing that listed "Hedge Funds
-    Hike Bullish Oil Bets" as items 1 and 2 was the visible result. Keyed on URL and on the
-    stemmed headline, so a reissue on a new link is also caught.
+    Three ways the same story reaches this list twice. Reposted on 4 September, when a
+    stale local run resent what the cloud had posted — identical URL. Reissued on a new
+    link — identical stemmed headline. And filed by two outlets more than three hours
+    apart, outside the newswire's own cross-outlet window — "DP World expands contract
+    logistics network in Thailand" (Zawya) and "DP World adds Bangkok distribution hub to
+    Thailand network" (Seatrade) were items 1 and 5 of one briefing. The third case is
+    caught the way the newswire catches it: half the significant words in common.
     """
-    by_key: dict[str, dict] = {}
+    kept: list[dict] = []
     for e in entries:
-        keys = [e.get("url") or "", " ".join(e.get("words") or [])]
-        hit = next((by_key[k] for k in keys if k and k in by_key), None)
-        if hit is None:
-            entry = dict(e)
-            for k in keys:
-                if k:
-                    by_key[k] = entry
+        words = e.get("words") or []
+        idx = next((i for i, k in enumerate(kept)
+                    if (e.get("url") and e.get("url") == k.get("url"))
+                    or (words and words == (k.get("words") or []))
+                    or _overlap(words, k.get("words") or []) >= 0.5), None)
+        if idx is None:
+            kept.append(dict(e))
             continue
-        hit["corroboration"] = max(int(hit.get("corroboration", 0)), int(e.get("corroboration", 0)))
-    seen_ids: set[int] = set()
-    out = []
-    for entry in by_key.values():
-        if id(entry) not in seen_ids:
-            seen_ids.add(id(entry))
-            out.append(entry)
-    return out
+        # Two outlets on one story is corroboration. Keep the better-known outlet's
+        # version as the face of it — a merged story credited to "Taiwan News" when Zawya
+        # also filed it is wrong attribution for this desk.
+        prior = kept[idx]
+        corr = max(int(prior.get("corroboration", 0)), int(e.get("corroboration", 0))) + 1
+        if (e.get("outlet") or "").lower() in TIER_ONE and \
+           (prior.get("outlet") or "").lower() not in TIER_ONE:
+            kept[idx] = dict(e)
+        kept[idx]["corroboration"] = corr
+    return kept
 
 
 def rank(entries: list[dict]) -> list[dict]:
@@ -117,6 +129,13 @@ def rank(entries: list[dict]) -> list[dict]:
         if e.get("kind") == "brief":
             continue
         title = e.get("title") or ""
+        # "Geopolitics is not of interest." An oil-or-politics story reaches the briefing
+        # only if a named company, fund or person is its subject; otherwise it is left to
+        # the firehose channel. Corroboration alone had put "US moves thousands of troops
+        # to Middle East" second in a briefing — three outlets filing a war story is not
+        # evidence this desk wants it.
+        if (e.get("category") or "") in ("oil_geopolitics", "energy") and not BIG_ACTORS.search(title):
+            continue
         weight = 0.0
         # Corroboration is the strongest signal available and the only one that is not a
         # guess: each point is another newsroom independently deciding this was worth
@@ -127,10 +146,16 @@ def rank(entries: list[dict]) -> list[dict]:
         weight += 0.5 * max(0, int(e.get("score", 0)) - 4)
         if (e.get("outlet") or "").lower() in TIER_ONE:
             weight += 1.0
-        # Conflict economics has been the spine of this beat all year — Hormuz transits,
-        # rerouting, war-risk premiums.
-        if "conflict_econ" in (e.get("axes") or []):
+        # The desk's preferences, in numbers (feedback of 1 October 2026): people, royals
+        # and culture are the "less obvious things" they want surfaced; oil and politics
+        # is what they were drowning in. Conflict economics no longer earns a bonus.
+        cat = e.get("category") or ""
+        if cat in ("people", "royals", "culture"):
+            weight += 1.5
+        elif cat == "sovereign_funds":
             weight += 1.0
+        elif cat in ("oil_geopolitics", "energy"):
+            weight -= 2.0
         item = dict(e)
         item["weight"] = round(weight, 2)
         scored.append(item)
@@ -138,22 +163,31 @@ def rank(entries: list[dict]) -> list[dict]:
 
 
 SYSTEM_PROMPT = """You are briefing the editors of The Circuit, a publication covering \
-business, finance, energy and technology in the Gulf and wider Middle East.
+business, finance and the people behind them in the Gulf and wider Middle East.
 
 You will be given headlines their newswire posted since the last briefing, already ranked \
-by a crude weighting. Choose the FIVE an editor must not miss, and order them by \
-importance.
+by a crude weighting. Choose the FIVE an editor must not miss, and order them by importance.
 
-Choose for:
-- Consequence. A sovereign fund taking a stake, a national champion restructuring, a \
-policy or regulatory change that moves money, a disruption to trade routes or energy flows.
-- Distinctness. Do not pick five versions of one story. If three headlines are all about \
-Hormuz shipping, pick the strongest and use the other slots for different subjects.
-- Novelty. Prefer a development over a restatement, and a decision over a comment about a \
-decision.
+What this desk wants, in their own words: "Companies, companies, companies, and people — \
+that's the stuff." Specifically:
+- Sovereign wealth funds: PIF, Mubadala, ADIA, ADQ, QIA and the smaller ones — stakes, \
+exits, new vehicles, leadership.
+- Companies: investments, signed agreements, acquisitions, IPOs, joint ventures, expansions.
+- People: CEOs, bankers, founders, dealmakers — appointments, departures, who is rising. \
+The editor "loves the little nitpicks of so-and-so got promoted."
+- Gulf royals doing things: investing, launching, backing, patronising.
+- Cultural happenings: museums, festivals, film, fashion, sport-as-entertainment, celebrity.
 
-Avoid: routine market wraps, index moves, gold prices, scheduled data releases, conference \
-announcements, vendor press releases, and anything whose only claim is that a number changed.
+What this desk does NOT want: "Geopolitics is not of interest." Oil prices, OPEC moves, \
+Hormuz shipping, Iran, Israel, military and diplomatic news. Include such a story ONLY if \
+a named company or fund is the subject and the business consequence is the point (Aramco \
+cutting European deliveries: yes; "oil drops as supply concerns ease": never). Prefer the \
+less obvious story over the one every outlet led with.
+
+Choose for consequence, distinctness and novelty. Do not pick five versions of one story. \
+Prefer a development over a restatement, and a decision over a comment about a decision. \
+Avoid market wraps, index moves, scheduled data releases, conference announcements and \
+vendor press releases.
 
 For each chosen story write ONE sentence on why it matters to this desk.
 
@@ -166,10 +200,10 @@ a news meeting. Examples of the difference:
   good (consequence): "First test of investor appetite for Egyptian paper since the IMF \
 review, and the pricing will set the floor for the region's other deficit borrowers."
 
-  headline: "Adnoc keeps loading LNG on tankers despite Hormuz disruption"
-  bad  (restatement): "Adnoc is maintaining LNG exports despite disruption."
-  good (consequence): "Cuts against the assumption that Gulf gas exports have stalled, \
-and suggests buyers are still accepting Hormuz transit risk."
+  headline: "talabat appoints Selin Süzer as chief marketing officer"
+  bad  (restatement): "talabat has a new CMO."
+  good (consequence): "Third senior hire from outside the region this year — Delivery \
+Hero's Gulf unit is being staffed for a listing-era brand push, not a cost squeeze."
 
 Do not invent detail that is not in the headline: no deal sizes, dates, names or causes \
 that are not there. Where the implication is genuinely uncertain, say what it would tell \
@@ -320,9 +354,29 @@ def edition_label(when: datetime | None = None) -> str:
     return edition[1] if edition else "Overnight"
 
 
+CATEGORY_LABELS = {
+    "sovereign_funds": "Sovereign funds", "companies": "Companies & deals", "people": "People",
+    "royals": "Royals", "culture": "Culture", "oil_geopolitics": "Oil & geopolitics",
+    # legacy labels in older log entries
+    "gulf": "Companies & deals", "energy": "Oil & geopolitics", "tech": "Companies & deals",
+    "mena": "Companies & deals",
+}
+# Sections shown in the by-category tail, in this order. Oil & geopolitics is deliberately
+# absent: the desk said it is what they do not want, and the firehose channel still has it.
+BY_CATEGORY = ("sovereign_funds", "companies", "people", "royals", "culture")
+PER_CATEGORY = 3
+
+
 def format_brief(chosen: list[dict], how: str, period_hours: float, total: int,
-                 when: datetime | None = None, label: str | None = None) -> str:
-    """The Slack message. Plain, and honest about how the five were chosen."""
+                 when: datetime | None = None, label: str | None = None,
+                 ranked: list[dict] | None = None) -> str:
+    """The Slack message: the five that matter, then the period by the desk's categories.
+
+    Two views in one message because the desk asked how to tell "top stories" from "this
+    other category that is our company-focus". The five are judgment; the tail is a
+    filing cabinet, so an editor who only cares about people moves finds them without
+    reading the rest.
+    """
     count = len(chosen)
     header = (f"*{label or edition_label(when)} briefing* — {count} to check from "
               f"{total} stor{'y' if total == 1 else 'ies'} in the last {period_hours:.0f}h")
@@ -340,11 +394,25 @@ def format_brief(chosen: list[dict], how: str, period_hours: float, total: int,
             lines.append(f"_{_escape(why)}_")
         lines.append("")
     if how == "ranked":
-        # Say so. A list assembled by weighting alone may contain two versions of one
-        # story, and the reader should know which kind of list they are holding.
         lines.append("_Selected by ranking only — editorial pass unavailable this run._")
     elif how == "all":
-        # Not a failure, and not a curated five either: everything the period produced.
-        lines.append(f"_A quiet period — this is everything the newswire posted, "
-                     f"not a selection._")
+        lines.append("_A quiet period — this is everything the newswire posted, not a selection._")
+
+    # By category: the rest of the period, best-ranked first, excluding what is above.
+    if ranked:
+        shown = {e.get("url") for e in chosen}
+        sections = []
+        for cat in BY_CATEGORY:
+            picks = [e for e in ranked
+                     if CATEGORY_LABELS.get(e.get("category") or "") == CATEGORY_LABELS[cat]
+                     and e.get("url") not in shown][:PER_CATEGORY]
+            if not picks:
+                continue
+            sections.append(f"*{CATEGORY_LABELS[cat]}*")
+            for e in picks:
+                sections.append(f"• <{e.get('url')}|{_escape(e.get('title') or '')}> — "
+                                f"{_escape(e.get('outlet') or '')}")
+            sections.append("")
+        if sections:
+            lines += ["", "*Also, by category*", ""] + sections
     return "\n".join(lines).strip()

@@ -19,31 +19,46 @@ first-class, and the schedule is a cron line.
 
 ## How it decides what matters
 
-Additive keyword scoring, no AI. Four axes, and the weighting is the whole design:
+Additive keyword scoring, no AI. The axes, and the weighting is the whole design:
 
 | Axis | Points |
 |---|---|
 | Named commercial entity (PIF, ADNOC, DP World, Emaar…) | 3 |
-| Named principal (MBS, MBZ, Tahnoun, Al-Rumayyan…) | 3 |
-| Conflict economics (Hormuz, rerouting, war-risk insurance) | 3 |
+| Named principal — leaders, royals, bankers, founders | 3 |
 | Geography (the GCC, plus Egypt/Jordan/Iraq/Türkiye…) | 2 |
-| Sector — business, ventures, technology, science | 2 |
+| Sector — business, ventures, technology, regulation | 2 |
+| People moves — appoints, steps down, named CEO, joins board | 2 |
+| Culture — museums, festivals, film, fashion, sport-as-entertainment | 2 |
+| Conflict economics (Hormuz, rerouting, war-risk) | 1 |
 | Money scale (`$`, billion, million, percentages) | 1 |
+| **Oil & geopolitics** — oil prices, OPEC, Iran, Israel, missiles, ceasefire, sanctions | **−2**, applied only when no company or person is named |
 
 **Geography is worth less than the threshold on purpose.** Reading 269 of The Circuit's
 own story headlines makes the reason plain: of their eleven Egypt stories, ten carry a
-business or technology term — a tire factory, an IMF payout, a minerals survey, an
-airport terminal, Cairo stocks. Egypt never appears as Egypt. It appears as a venue for
-capital. So at the default threshold of 4, "Saudi Arabia arrests cleric" scores 2 and
-dies, while "Egypt seeks bids to build a $500 million tire factory" scores 5.
+business or technology term. Egypt never appears as Egypt; it appears as a venue for
+capital. "Saudi Arabia arrests cleric" scores 2 and dies; "Egypt seeks bids to build a
+$500 million tire factory" scores 5.
 
-Per-source thresholds do the rest: 3 for AGBI and Zawya, which publish nothing off-beat;
-6 for Bloomberg, Reuters, the two Gulf consumer dailies and Argaam's market-disclosure
-firehose.
+**Oil and politics are penalised unless a company or person is the subject.** This was
+the Circuit desk's feedback on 1 October 2026, nearly verbatim: *"Companies, companies,
+companies, and people — that's the stuff… Geopolitics is not of interest… What I don't
+need and am primarily getting is stories about oil and politics."* Over the preceding two
+weeks 30% of what posted was oil or geopolitics and 24% named no company, fund or deal.
+"Oil Drops for Third Day as Supply Concerns Ease in Middle East" now scores 4 − 2 and
+drops; "Aramco halts October crude deliveries to European refiners" is untouched by the
+penalty and posts. Replayed over those same two weeks: oil & geopolitics falls from 30%
+to 13% of output, and every survivor names an actor.
 
-Measured against fixtures on every change (`poll.py --selftest`): **94.8% recall** on
-Circuit's real story headlines, **8.3%** pass rate on a curated negative set of Gulf
-tabloid and general-wire headlines.
+**Every story is filed under the desk's own categories** — sovereign funds; companies &
+deals; people; royals; culture; and oil & geopolitics, named so it can be demoted and
+filtered rather than hidden inside "business". They label each digest line, section the
+briefing, and drive the browse page.
+
+Per-source thresholds do the rest: 3 for on-beat trade press and the appointments
+streams, 4 default, 5–6 for general wires and the Gulf consumer dailies.
+
+Measured against fixtures on every change (`poll.py --selftest`): **95% recall** on
+Circuit's non-geopolitics story headlines, **6% noise** on a curated negative set.
 
 ### The limitation, stated up front
 
@@ -111,6 +126,18 @@ python3 poll.py --status                   # what happened on the last run
 next tick. After any scoring change run `--selftest`: it reports recall *and* noise, so a
 word you add to close one miss shows its cost as well as its benefit. Regenerate the
 fixtures from live data with `python3 tests/regen_fixtures.py`.
+
+## Browse by category
+
+Everything posted in the last fourteen days, filterable by the desk's categories, outlet
+and date, served by GitHub Pages straight from this repository's `posted_log.json`:
+
+```
+https://levelthreelabso.github.io/circuit-newswire/
+```
+
+No build, no server, no framework — `index.html` fetches the log from the same origin.
+It is the "ask by category and get a list" the desk asked for, without the AI.
 
 ## Observability
 

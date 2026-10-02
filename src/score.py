@@ -87,10 +87,11 @@ class Scorer:
         self.bylines = [b.lower() for b in self.config.get("byline_bypass", [])]
         # Section routing, from the same vocabulary the scorer already reads.
         cats = self.config.get("categories", {})
-        self._energy = _compile(cats.get("energy", []))
-        self._tech = _compile(cats.get("tech", []))
-        self._mena = _compile(cats.get("wider_mena", []))
-        self._gcc = _compile(cats.get("gcc", []))
+        self._people = _compile(cats.get("people", []))
+        self._swf = _compile(cats.get("sovereign_funds", []))
+        self._royals = _compile(cats.get("royals", []))
+        self._culture = _compile(cats.get("culture", []))
+        self._geopolitics = _compile(cats.get("oil_geopolitics", []))
 
     # ---- the gate -----------------------------------------------------------
 
@@ -118,17 +119,38 @@ class Scorer:
         axes_hit: list[str] = []
         title_axes: list[str] = []
         matched: list[str] = []
+        penalties = 0
         for name, points, pattern in self.axes:
             hits = pattern.findall(text)
-            if hits:
-                total += points
-                axes_hit.append(name)
-                matched += [h if isinstance(h, str) else h[0] for h in hits[:3]]
+            if not hits:
+                continue
+            matched += [h if isinstance(h, str) else h[0] for h in hits[:3]]
+            if points < 0:
+                # Penalty axes lower the score but are never a "signal": they must not
+                # satisfy require_anchor or count toward min_title_axes. Applied after the
+                # loop, and only when no company or person anchors the story — see below.
+                penalties += points
+                continue
+            total += points
+            axes_hit.append(name)
             if pattern.search(title_text):
                 title_axes.append(name)
         if self.money.search(text):
             total += self.money_points
             axes_hit.append("money")
+            # A figure in the headline IS a headline signal. "L'imad, BlackRock, Temasek,
+            # ADNOC to co-invest $30 billion" carried entity + money and was dropped for
+            # having only one title axis — on a desk whose own words were "companies,
+            # especially investments and signed agreements".
+            if self.money.search(title_text):
+                title_axes.append("money")
+        # Oil and politics are noise unless a company or a person is the subject. The
+        # penalty sinks "Oil Drops for Third Day as Supply Concerns Ease in Middle East"
+        # (no one named: 4 − 2 = 2) but leaves "Aramco halts October crude deliveries to
+        # European refiners" alone (Aramco is the story: 5). An unconditional penalty had
+        # been dropping the second kind, which is exactly what the desk wants most.
+        if penalties and not ({"entity", "principal"} & set(axes_hit)):
+            total += penalties
 
         bypass = self._byline(author)
         # Dedupe matched terms, preserving order, and keep the list short enough to log.
@@ -167,23 +189,32 @@ class Scorer:
     # ---- categorisation -----------------------------------------------------
 
     def categorize(self, title: str, body: str = "") -> str:
-        """Which digest section a story belongs in.
+        """Which section a story belongs in — the editor's categories, not the beat's.
 
-        Derived from the story, not from its source: the same outlet files a data-center
-        deal and a tanker rerouting, and the reader wants those in different places. The
-        order is a priority — a story about rerouting crude away from Hormuz is energy
-        news first, wherever it happens.
+        From the Circuit desk's own words: "Companies, companies, companies, and people —
+        that's the stuff." Sovereign funds, deals, people moves, royals and culture are
+        what they want; oil and politics is what they were getting. So the sections are
+        theirs, and oil & geopolitics is a named bucket rather than the default, so it
+        can be demoted, filtered and counted.
+
+        Priority order matters: a fund appointing a CIO is a people story first (the desk
+        "loves the little nitpicks of so-and-so got promoted"), then a sovereign-fund
+        story. Companies is the default for anything business-shaped that fits nowhere
+        more specific.
         """
         text = f" {title} {body} "
-        if self._energy.search(text):
-            return "energy"
-        if self._tech.search(text):
-            return "tech"
-        # Wider MENA only counts as such when no Gulf state is in the story at all;
-        # a Saudi investment in Egypt is Gulf business, not Egyptian business.
-        if self._mena.search(text) and not self._gcc.search(text):
-            return "mena"
-        return "gulf"
+        head = f" {title} "
+        if self._people.search(head):
+            return "people"
+        if self._swf.search(text):
+            return "sovereign_funds"
+        if self._royals.search(head):
+            return "royals"
+        if self._culture.search(text):
+            return "culture"
+        if self._geopolitics.search(head) and not self._swf.search(text):
+            return "oil_geopolitics"
+        return "companies"
 
     # ---- the dormant seam ---------------------------------------------------
 

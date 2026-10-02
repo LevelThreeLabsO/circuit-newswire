@@ -136,7 +136,7 @@ def main() -> int:
         return 0
 
     label = brief.current_edition()[1] if brief.current_edition() else None
-    text = brief.format_brief(chosen, how, hours, len(stories), label=label)
+    text = brief.format_brief(chosen, how, hours, len(stories), label=label, ranked=ranked)
     print(f"\nselection: {how}\n")
     print(text)
 

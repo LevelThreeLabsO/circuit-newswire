@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Circuit Newswire — browse by category</title>
+<!--
+  Everything the newswire has posted in the last fourteen days, filterable by the desk's
+  own categories. The Circuit's editor asked to "ask the AI by category and get a list of
+  curated options" — this is the no-AI version of that: the same log the briefing reads,
+  served by GitHub Pages from this repository, filtered in the browser.
+
+  No build step, no server, no framework. The page fetches ../posted_log.json from the
+  same origin, so it is always as current as the last run's commit (Pages republishes
+  within a minute or two of each push).
+-->
+<style>
+  :root { --ink:#16181d; --muted:#6b7280; --line:#e5e7eb; --paper:#fff; --accent:#1d4ed8; --chip:#f3f4f6; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e7e9ee; --muted:#9aa3b2; --line:#2a2f3a; --paper:#111318; --accent:#8ab4ff; --chip:#1b1f27; }
+  }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif }
+  .wrap { max-width: 56rem; margin: 0 auto; padding: 2rem 1.25rem 4rem }
+  h1 { font-size:1.35rem; margin:0 0 .25rem }
+  .sub { color:var(--muted); margin:0 0 1.25rem }
+  .controls { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-bottom:1rem }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem }
+  .chip { border:1px solid var(--line); background:var(--chip); color:var(--ink); border-radius:999px; padding:.3rem .8rem; cursor:pointer; font-size:.9rem }
+  .chip[aria-pressed="true"] { background:var(--accent); color:#fff; border-color:var(--accent) }
+  input[type=search], select { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:.5rem; padding:.45rem .7rem; font:inherit }
+  input[type=search] { flex:1 1 14rem }
+  .count { color:var(--muted); font-size:.9rem; margin:.5rem 0 1rem }
+  .day { font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:1.5rem 0 .5rem; border-bottom:1px solid var(--line); padding-bottom:.25rem }
+  .item { padding:.55rem 0; border-bottom:1px solid var(--line) }
+  .item a { color:var(--ink); text-decoration:none; font-weight:600 }
+  .item a:hover { color:var(--accent); text-decoration:underline }
+  .meta { color:var(--muted); font-size:.85rem }
+  .tag { display:inline-block; font-size:.72rem; padding:.05rem .45rem; border-radius:.35rem; background:var(--chip); margin-left:.4rem; vertical-align:middle }
+  .empty { color:var(--muted); padding:2rem 0 }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Circuit Newswire</h1>
+  <p class="sub">Everything posted in the last fourteen days, by category. Updates within minutes of each run.</p>
+
+  <div class="controls">
+    <div class="chips" id="cats" role="group" aria-label="Category"></div>
+  </div>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search headlines, outlets…" aria-label="Search">
+    <select id="days" aria-label="Period">
+      <option value="1">Last 24 hours</option>
+      <option value="3">Last 3 days</option>
+      <option value="7" selected>Last 7 days</option>
+      <option value="14">Last 14 days</option>
+    </select>
+    <select id="sort" aria-label="Sort">
+      <option value="time" selected>Newest first</option>
+      <option value="corr">Most covered first</option>
+    </select>
+  </div>
+  <div class="count" id="count">Loading…</div>
+  <div id="list"></div>
+</div>
+
+<script>
+(function () {
+  // The desk's categories, in their order. Older entries carry the previous labels and
+  // are mapped onto these so nothing disappears.
+  const CATS = [
+    ["all", "All"],
+    ["sovereign_funds", "Sovereign funds"],
+    ["companies", "Companies & deals"],
+    ["people", "People"],
+    ["royals", "Royals"],
+    ["culture", "Culture"],
+    ["oil_geopolitics", "Oil & geopolitics"],
+  ];
+  const LEGACY = { gulf: "companies", energy: "oil_geopolitics", tech: "companies", mena: "companies" };
+  const LABEL = Object.fromEntries(CATS);
+
+  const state = { cat: "all", q: "", days: 7, sort: "time" };
+  let entries = [];
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function norm(e) {
+    const cat = LEGACY[e.category] || e.category || "companies";
+    return { ...e, cat, t: Date.parse(e.at) || 0 };
+  }
+
+  function render() {
+    const cutoff = Date.now() - state.days * 86400e3;
+    const q = state.q.trim().toLowerCase();
+    let rows = entries.filter((e) => e.t >= cutoff && (state.cat === "all" || e.cat === state.cat));
+    if (q) rows = rows.filter((e) => (e.title + " " + (e.outlet || "")).toLowerCase().includes(q));
+    rows.sort((a, b) => state.sort === "corr"
+      ? (b.corroboration || 0) - (a.corroboration || 0) || b.t - a.t
+      : b.t - a.t);
+
+    $("count").textContent = rows.length
+      ? `${rows.length} stor${rows.length === 1 ? "y" : "ies"}`
+      : "";
+    const list = $("list");
+    if (!rows.length) { list.innerHTML = '<div class="empty">Nothing in this period.</div>'; return; }
+
+    let html = "", day = "";
+    for (const e of rows) {
+      const d = new Date(e.t);
+      const key = d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+      if (state.sort === "time" && key !== day) { day = key; html += `<div class="day">${esc(day)}</div>`; }
+      const time = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+      const corr = e.corroboration ? ` · also filed by ${e.corroboration} other${e.corroboration === 1 ? "" : "s"}` : "";
+      const tag = state.cat === "all" ? `<span class="tag">${esc(LABEL[e.cat] || e.cat)}</span>` : "";
+      html += `<div class="item"><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a>${tag}` +
+              `<div class="meta">${esc(e.outlet || "")}${e.desk ? " (" + esc(e.desk) + ")" : ""} · ${time}${corr}</div></div>`;
+    }
+    list.innerHTML = html;
+  }
+
+  function buildChips() {
+    const box = $("cats");
+    box.innerHTML = CATS.map(([k, label]) =>
+      `<button class="chip" data-cat="${k}" aria-pressed="${k === state.cat}">${esc(label)}</button>`).join("");
+    box.addEventListener("click", (ev) => {
+      const b = ev.target.closest("button[data-cat]"); if (!b) return;
+      state.cat = b.dataset.cat;
+      box.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+      render();
+    });
+  }
+
+  $("q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+  $("days").addEventListener("change", (e) => { state.days = +e.target.value; render(); });
+  $("sort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+
+  buildChips();
+  fetch("posted_log.json", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((data) => {
+      entries = (Array.isArray(data) ? data : []).filter((e) => e && e.kind !== "brief" && e.title).map(norm);
+      render();
+    })
+    .catch((err) => { $("count").textContent = `Could not load the log (${err.message}).`; });
+})();
+</script>
+</body>
+</html>

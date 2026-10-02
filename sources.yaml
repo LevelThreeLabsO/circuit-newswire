@@ -473,3 +473,90 @@ sources:
     url: mediaoffice.ae
     publisher: [Dubai Media Office, Government of Dubai Media Office, mediaoffice.ae]
     threshold: 5
+
+  # ══ People, royals and culture ═══════════════════════════════════════════════
+  # Added 2 October 2026 on the Circuit desk's feedback: "Companies, companies, companies,
+  # and people — that's the stuff." Appointments, departures, bankers, royals doing
+  # things, and the cultural calendar. Yield measured over 7 days before adding: Zawya's
+  # appointments stream 74 usable items, The National's arts desk 78.
+
+  # Zawya carries nearly every regional appointment release. Threshold 3: a bare
+  # "X appoints Y as CEO" from a MENA company is the point of the source.
+  - key: zawya_people
+    outlet: Zawya
+    desk: People
+    method: gnews
+    url: zawya.com
+    query: "(appoints OR appointed OR \"named CEO\" OR \"chief executive\" OR promoted OR \"steps down\" OR \"managing director\")"
+    publisher: [Zawya, zawya.com]
+    threshold: 3
+
+  - key: arabianbusiness_people
+    outlet: Arabian Business
+    desk: People
+    method: gnews
+    url: arabianbusiness.com
+    query: "(appoints OR appointed OR CEO OR \"steps down\" OR promoted OR \"joins as\" OR billionaire)"
+    publisher: [Arabian Business, arabianbusiness.com]
+    threshold: 3
+
+  - key: gulfbusiness_people
+    outlet: Gulf Business
+    desk: People
+    method: gnews
+    url: gulfbusiness.com
+    query: "(appoints OR appointed OR CEO OR \"managing director\" OR interview)"
+    publisher: [Gulf Business, gulfbusiness.com]
+    threshold: 3
+
+  # Investment bankers and global asset managers moving people into, or money through,
+  # the Gulf. The desk named "investment bankers" specifically.
+  - key: q_bankers
+    outlet: Bankers & asset managers
+    desk: People
+    method: gnews_entity
+    query: '((Goldman OR JPMorgan OR "Morgan Stanley" OR Citi OR HSBC OR Rothschild OR Lazard OR Moelis OR "Standard Chartered" OR Barclays OR UBS OR BlackRock OR Blackstone OR KKR OR Apollo OR Carlyle OR Brookfield OR "Bank of America") (Dubai OR Riyadh OR "Abu Dhabi" OR Doha OR Gulf OR Saudi OR UAE OR Qatar) (hires OR appoints OR joins OR names OR head OR "opens office" OR expands OR fund OR stake OR deal))'
+    threshold: 4
+
+  # Royals as actors — investing, launching, patronising — not royals receiving
+  # ambassadors (vetoed in scoring.yaml).
+  - key: q_royals
+    outlet: Gulf royals
+    desk: Royals
+    method: gnews_entity
+    query: '(("Sheikh Tahnoon" OR "Sheikh Tahnoun" OR "Sheikh Mansour" OR "Sheikh Hamdan" OR "Sheikh Khaled" OR "Sheikha Latifa" OR "Sheikha Mozah" OR "Sheikha Moza" OR "Prince Alwaleed" OR "Crown Prince Mohammed" OR "Sheikh Maktoum" OR "Sheikha Bodour" OR "Sheikha Hoor") (invest OR investment OR fund OR acquires OR stake OR launches OR foundation OR venture OR backs OR buys OR opens))'
+    threshold: 4
+
+  # The National's arts and culture desk — the deepest English-language cultural coverage
+  # of the UAE. Threshold 3 because the query is already culture-scoped.
+  - key: national_culture
+    outlet: The National
+    desk: Culture
+    method: gnews
+    url: thenationalnews.com
+    query: "(arts OR culture OR museum OR festival OR exhibition OR film OR fashion OR concert OR gallery OR biennale)"
+    publisher: [The National, thenationalnews.com]
+    threshold: 3
+
+  - key: q_culture
+    outlet: Gulf culture
+    desk: Culture
+    method: gnews_entity
+    # Six named institutions, not fourteen: Google News returns nothing at all for a long
+    # quoted-OR list (the first version had an unquoted "Formula 1" Abu Dhabi fragment and
+    # came back empty), while this form returns a full hundred. The National's culture desk
+    # and the culture vocabulary in scoring.yaml cover what is not named here.
+    query: '("Art Dubai" OR "Louvre Abu Dhabi" OR "Riyadh Season" OR "Diriyah Biennale" OR "Red Sea Film Festival" OR "Dubai Opera")'
+    threshold: 3
+
+  # Calcalist / CTech: the desk's editor listed it among what he reads each night. Scoped
+  # to Gulf and deal vocabulary so Israeli domestic tech news does not come along. An
+  # earlier decision kept Israel off the beat; the reader's own list overrides it, narrowly.
+  - key: calcalist
+    outlet: Calcalist
+    desk: Israel–Gulf
+    method: gnews
+    url: calcalistech.com
+    query: "(Gulf OR UAE OR Saudi OR \"Abu Dhabi\" OR Dubai OR Qatar OR Emirati OR Mubadala OR acquires OR acquisition OR raises OR \"sovereign wealth\")"
+    publisher: [CTech, Calcalist, calcalistech.com]
+    threshold: 4

@@ -10,15 +10,21 @@
 default_threshold: 4
 
 # An item must hit at least one of these axes, whatever its score. They are the "is this
-# our region at all" test: a Gulf state, a named Gulf company or fund, a named principal,
-# or the conflict economics of the Gulf's waterways.
+# our region at all" test: a Gulf state, a named Gulf company or fund, a named principal.
+#
+# conflict_econ was an anchor until 2 October 2026 and is not any more. The Circuit desk's
+# feedback was blunt: "What I don't need and am primarily getting is stories about oil and
+# politics." Measured over the preceding 14 days, 30% of what posted was oil or geopolitics
+# and 24% named no company, fund or deal at all — "Hormuz under fire again" was admitting
+# itself on the strength of one word. A trade-route story now has to name a company, fund,
+# person or place like everything else.
 #
 # This exists so thresholds can be loosened without admitting global business noise.
 # Measured on 48 hours of Bloomberg and Reuters, dropping the bar to 3 without it let in
 # "Thailand's Power Giant Sees Revenue Up 15%", "Kioxia, Sandisk Plan $31 Billion Japan
 # Memory Chip Expansion" and "Watch How LeBron James Scored $300 Million From Insurers" —
 # all of which score on sector plus money and name no part of this region.
-require_anchor: [entity, principal, geography, conflict_econ]
+require_anchor: [entity, principal, geography]
 
 # Distinct axes the HEADLINE must hit. A place name on its own is a war-and-diplomacy
 # story, not a business one, and body text is enough to carry it past the threshold.
@@ -219,9 +225,72 @@ axes:
   # The Gulf elite network is a Circuit beat in its own right — the Tahnoun photograph,
   # the Budapest huddle, the World Cup final box, the Macron manga theme park. Those
   # stories carry no business vocabulary at all and would otherwise be invisible.
+  # Named leaders AND Gulf royalty generally. The desk wants "stories about gulf royals";
+  # the houses and titles below catch a royal the roster has not named yet. Ceremonial
+  # state-wire items ("receives credentials of", "exchanges greetings") are vetoed in the
+  # noise list, so a royal counts here when the story is about something they did.
   - name: principal
     points: 3
     terms:
+      - Sheikh
+      - Sheikha
+      - Crown Prince
+      - Emir
+      - Ruler of
+      - His Highness
+      - Her Highness
+      - Al Nahyan
+      - Al Maktoum
+      - Al Thani
+      - Al Saud
+      - Al Sabah
+      - Al Khalifa
+      - Al Said
+      - Al Qasimi
+      - Prince Alwaleed
+      - Alwaleed bin Talal
+      - Faisal Al Bannai
+      - Al Bannai
+      - Peng Xiao
+      - Omar Al Olama
+      - Al Olama
+      - Mohammed Alabbar
+      - Alabbar
+      - Hussain Sajwani
+      - Sajwani
+      - Ahmed bin Sulayem
+      - bin Sulayem
+      - Mohammed Al Gergawi
+      - Al Gergawi
+      - Hadi Badri
+      - Nasser Al-Khelaifi
+      - Al-Khelaifi
+      - Al Khelaifi
+      - Majid Al Futtaim
+      - Al Futtaim
+      - Al Ghurair
+      - Al Habtoor
+      - Olayan
+      - Al Rajhi
+      - Kingdom Holding
+      - Amin Nasser
+      - Sultan Al Jaber
+      - Al Jaber
+      - Yasir Al-Rumayyan
+      - Al-Rumayyan
+      - Al Rumayyan
+      - Khaldoon Al Mubarak
+      - Al Mubarak
+      - Mansoor Al Mahmoud
+      - Hamad Al Shamsi
+      - Jassim Al Seddiqi
+      - Khalifa Al Mazrouei
+      - Sheikha Mozah
+      - Sheikha Latifa
+      - Sheikha Moza
+      - Sheikha Bodour
+      - Sheikha Hoor
+      - Sheikha Fatima
       - MBS
       - Mohammed bin Salman
       - MBZ
@@ -606,7 +675,6 @@ axes:
       - battery
       - gaming
       - esports
-      - streaming
       # Property, hospitality, consumer
       - real estate
       - property
@@ -623,9 +691,7 @@ axes:
       - tourist
       - hotel
       - hotels
-      - resort
       - hospitality
-      - restaurant
       - airline
       - aviation
       - airport
@@ -665,8 +731,249 @@ axes:
   # Hormuz appears in 24 of 269 Circuit headlines. This is not war coverage — it is the
   # economics of a chokepoint: rerouting, war-risk premiums, closed airspace, insurers
   # threatening to cancel. Weighted like an entity because on this beat it is one.
+  # 1 point, down from 3. Rerouting and war-risk premiums still tell you something when
+  # ADNOC or DP World is in the headline; on their own they are the oil-and-politics
+  # stream the desk asked to be rid of.
+  # People moves. "Max loves the little nitpicks of so-and-so got promoted." A companion
+  # signal: with a Gulf company (entity 3) or a Gulf city (geography 2) in the headline it
+  # clears the bar; on its own it is any appointment anywhere. The dedicated appointments
+  # sources run at threshold 3 so a bare "X appoints Y as CEO" from Zawya gets through.
+  - name: people
+    points: 2
+    terms:
+      - appoints
+      - appointed
+      - appointment
+      - names
+      - named as
+      - promotes
+      - promoted
+      - elevates
+      - joins as
+      - joins
+      - hires
+      - hired
+      - steps down
+      - stepping down
+      - steps aside
+      - resigns
+      - resignation
+      - departs
+      - departure
+      - exits
+      - ousted
+      - replaces
+      - succeeds
+      - successor
+      - takes over as
+      - takes the helm
+      - new CEO
+      - new chief
+      - new chairman
+      - new chair
+      - new head
+      - chief executive
+      - chief financial officer
+      - chief investment officer
+      - chief operating officer
+      - CFO
+      - CIO
+      - COO
+      - CMO
+      - managing director
+      - general manager
+      - country head
+      - regional head
+      - head of
+      - board member
+      - board seat
+      - joins board
+      - to lead
+      - will lead
+      - tapped to
+      - poached
+      - meets
+      - meets with
+      - meeting with
+      - hosts
+      - visits
+      - investment banker
+      - banker
+      - dealmaker
+      - rainmaker
+      - founder
+      - co-founder
+      - billionaire
+      - tycoon
+      - heiress
+      - heir
+
+  # Cultural happenings: arts, museums, festivals, film, fashion, entertainment, and the
+  # celebrity end of it. A companion signal — with a Gulf place or institution it posts.
+  - name: culture
+    points: 2
+    terms:
+      - museum
+      - museums
+      - gallery
+      - galleries
+      - exhibition
+      - exhibitions
+      - biennale
+      - biennial
+      - art fair
+      - Art Dubai
+      - Abu Dhabi Art
+      - Louvre Abu Dhabi
+      - Guggenheim Abu Dhabi
+      - Zayed National Museum
+      - Saadiyat
+      - Sharjah Art Foundation
+      - Diriyah Biennale
+      - Misk Art
+      - Riyadh Season
+      - Jeddah Season
+      - AlUla
+      - Expo City
+      - Dubai Opera
+      - Dubai Design Week
+      - Dubai Design District
+      - Fashion Week
+      - fashion
+      - couture
+      - festival
+      - film festival
+      - Red Sea Film
+      - Red Sea Film Festival
+      - film
+      - cinema
+      - box office
+      - premiere
+      - documentary
+      - Netflix
+      - streaming
+      - concert
+      - singer
+      - rapper
+      - DJ
+      - orchestra
+      - opera
+      - theatre
+      - theater
+      - ballet
+      - artist
+      - artists
+      - sculpture
+      - painting
+      - auction
+      - Sotheby's
+      - Christie's
+      - arts
+      - arts scene
+      - art scene
+      - cultural
+      - culture
+      - celebrity
+      - celebrities
+      - influencer
+      - influencers
+      - actor
+      - actress
+      - Hollywood
+      - Bollywood
+      - esports
+      - gaming
+      - Formula 1
+      - F1
+      - Grand Prix
+      - World Cup
+      - Olympics
+      - LIV Golf
+      - UFC
+      - WWE
+      - Saudi Pro League
+      - Ronaldo
+      - Benzema
+      - Neymar
+      - restaurant
+      - resort
+
+  # PENALTY. Pure oil-price and geopolitics vocabulary: subtracted from the total, and
+  # never counted as a signal (see score.py). "Oil Drops for Third Day as Supply Concerns
+  # Ease in Middle East" is geography 2 + sector 2 = 4 and used to post; it is now 4 − 2
+  # = 2 and does not. "ADNOC reroutes crude as Hormuz closure persists" is entity 3 +
+  # sector 2 + geography 2 − 2 = 5 and still posts — the desk wants the company, not the
+  # commodity. "Geopolitics is not of interest."
+  - name: geopolitics
+    points: -2
+    terms:
+      # Bare "oil" and "crude" are penalised too. A company story survives it (ADNOC 3 +
+      # sector 2 + geography 2 − 2 = 5); a market wrap does not ("Oil Drops for Third Day
+      # as Supply Concerns Ease in Middle East" is 4 − 2 = 2).
+      - oil
+      - crude
+      - oil prices
+      - oil price
+      - oil market
+      - oil markets
+      - energy markets
+      - supply concerns
+      - crude prices
+      - crude price
+      - attacked
+      - attack on
+      - under fire
+      - seized
+      - UKMTO
+      - vessel attacked
+      - Brent
+      - WTI
+      - barrel
+      - barrels
+      - bpd
+      - OPEC+
+      - OPEC
+      - output cut
+      - output cuts
+      - production cut
+      - Iran
+      - Iranian
+      - Tehran
+      - Israel
+      - Israeli
+      - Gaza
+      - Hezbollah
+      - Houthi
+      - Houthis
+      - Hamas
+      - missile
+      - missiles
+      - drone attack
+      - drone strike
+      - airstrike
+      - airstrikes
+      - strikes on
+      - ceasefire
+      - truce
+      - peace talks
+      - nuclear talks
+      - sanctions
+      - warship
+      - navy
+      - troops
+      - war
+      - conflict
+      - escalation
+      - tensions
+      - Netanyahu
+      - Khamenei
+      - Araghchi
+      - Witkoff
+      - foreign minister
+      - UN Security Council
+
   - name: conflict_econ
-    points: 3
+    points: 1
     terms:
       - Hormuz
       - Strait of Hormuz
@@ -706,6 +1013,44 @@ axes:
 # service journalism, sport, celebrity, gold rates. This list exists because a mixed
 # tabloid corpus passed 15% on score alone, and almost all of it was this.
 noise:
+  # Ceremonial state-wire items. A royal receiving an ambassador's credentials is not a
+  # royals story; it is protocol. Vetoed so the broadened principal axis does not flood
+  # the channel with WAM and SPA court circulars.
+  - receives credentials
+  - presents credentials
+  - receives phone call
+  - receives call from
+  - exchanges greetings
+  - exchanges Eid
+  - congratulates
+  - congratulated
+  - condolences
+  - condoles
+  - offers condolences
+  - receives ambassador
+  - receives delegation
+  - meets ambassador
+  - meets envoy
+  - meets delegation
+  - meets minister
+  - meets foreign minister
+  - foreign minister
+  - prime minister of
+  - head of state
+  - meets with minister
+  - meets with delegation
+  - receives minister
+  - receives letter
+  - written message from
+  - performs Eid prayer
+  - attends wedding
+  - attends reception
+  - reviews bilateral
+  - bilateral relations
+  - discuss cooperation
+  - discusses cooperation
+  - ways to enhance
+  - strengthen cooperation
   - prayer times
   - gold rate
   - gold rates
@@ -838,24 +1183,41 @@ noise:
 # source — the same outlet files a data-center deal and a tanker rerouting. Checked in
 # order: energy, then tech, then wider-MENA-with-no-Gulf-state, else Gulf business.
 categories:
-  energy:
-    [oil, crude, gas, LNG, OPEC, refinery, pipeline, barrel, barrels, hydrogen, solar,
-     renewable, nuclear, power plant, electricity, grid, desalination, tanker, tankers,
-     shipping, vessel, vessels, freight, cargo, port, ports, terminal, logistics,
-     Hormuz, Red Sea, Suez, reroute, rerouting, war risk, ADNOC, Aramco, QatarEnergy,
-     Masdar, ACWA Power, TAQA, DP World, AD Ports, XRG, Borouge, Fertiglobe]
-  tech:
-    [artificial intelligence, AI, chip, chips, semiconductor, Nvidia, data center,
-     data centre, cloud, software, platform, digital, cyber, cybersecurity, crypto,
-     blockchain, digital assets, satellite, space, spaceport, biotech, genomics,
-     research, science, quantum, robotics, drone, drones, startup, startups, fintech,
-     gaming, esports, MGX, G42, Core42, Space42, Presight, Humain, Careem, Talabat]
-  wider_mena:
-    [Egypt, Egyptian, Cairo, Jordan, Morocco, Iraq, Iraqi, Syria, Syrian, Lebanon,
-     Turkey, Türkiye]
-  gcc:
-    [UAE, Emirates, Emirati, Abu Dhabi, Dubai, Sharjah, Saudi, Riyadh, Jeddah, Qatar,
-     Qatari, Doha, Kuwait, Kuwaiti, Bahrain, Oman, Omani, Muscat, GCC, Gulf]
+  # The Circuit desk's own buckets, in their words. Priority order is in score.py.
+  people:
+    [appoints, appointed, appointment, names, named as, promotes, promoted, elevates,
+     joins as, joins, hires, hired, steps down, stepping down, resigns, resignation,
+     departs, exits, ousted, replaces, succeeds, successor, takes over as, takes the helm,
+     new CEO, new chief, new chairman, new chair, new head, chief executive, CFO, CIO, COO,
+     managing director, country head, regional head, board member, board seat, to lead,
+     will lead, tapped to, poached, banker, bankers, dealmaker, billionaire, tycoon,
+     heiress, profile, interview, "in conversation"]
+  sovereign_funds:
+    [PIF, Public Investment Fund, Mubadala, ADIA, ADQ, QIA, Qatar Investment Authority,
+     KIA, Kuwait Investment Authority, Mumtalakat, Oman Investment Authority, OIA,
+     Lunate, Sanabil, Jada, MGX, Alat, Humain, Sovereign Fund of Egypt, sovereign wealth,
+     sovereign fund, wealth fund, Investcorp, Alpha Dhabi, IHC, 2PointZero, Chimera,
+     Al Rumayyan, Al-Rumayyan, Khaldoon, Al Mubarak]
+  royals:
+    [Sheikh, Sheikha, Crown Prince, Emir, Ruler of, His Highness, Her Highness, Al Nahyan,
+     Al Maktoum, Al Thani, Al Saud, Al Sabah, Al Khalifa, Al Said, Al Qasimi, MBS, MBZ,
+     bin Salman, bin Zayed, bin Rashid, bin Hamad, Prince Alwaleed, Alwaleed bin Talal,
+     royal, royals, princess, prince]
+  culture:
+    [museum, gallery, exhibition, biennale, biennial, art fair, Art Dubai, Louvre,
+     Guggenheim, Saadiyat, Diriyah Biennale, Riyadh Season, Jeddah Season, AlUla, Dubai
+     Opera, Design Week, Fashion Week, fashion, couture, festival, film, cinema, premiere,
+     documentary, Netflix, concert, singer, rapper, orchestra, opera, theatre, theater,
+     ballet, artist, sculpture, painting, auction, Sotheby's, Christie's,
+     cultural, culture, celebrity, influencer, actor, actress, Hollywood, Bollywood,
+     esports, gaming, Formula 1, F1, Grand Prix, World Cup, Olympics, LIV Golf, boxing,
+     UFC, WWE, Saudi Pro League, Ronaldo, Benzema, Neymar]
+  oil_geopolitics:
+    [oil, crude, Brent, WTI, barrel, barrels, bpd, OPEC, Hormuz, Red Sea, tanker, tankers,
+     Iran, Iranian, Tehran, Israel, Israeli, Gaza, Hezbollah, Houthi, Hamas, missile,
+     drone, airstrike, ceasefire, truce, talks, sanctions, military, navy, war, conflict,
+     escalation, Trump, Netanyahu, Khamenei, envoy, diplomat, Security Council, LNG,
+     gas exports, refinery, pipeline]
 
 # ── Byline bypass ───────────────────────────────────────────────────────────
 # Reporters whose every piece is worth seeing regardless of score. Requires the source

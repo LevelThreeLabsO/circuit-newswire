@@ -36,12 +36,23 @@ MAX_PER_SOURCE = 4
 
 # Order the digest reads in. Categories travel with each line rather than heading a
 # block, so the groups still read together without emoji headers.
-CATEGORY_ORDER = ["gulf", "energy", "tech", "mena"]
+# The Circuit desk's own categories (their words: sovereign funds; companies, especially
+# investments and signed agreements; people — CEOs, bankers, celebrities; Gulf royals;
+# cultural happenings). Oil & geopolitics is named so it can be demoted and filtered,
+# not hidden inside "business". Older log entries carry the previous labels, mapped here.
+CATEGORY_ORDER = ["sovereign_funds", "companies", "people", "royals", "culture", "oil_geopolitics"]
 CATEGORY_LABELS = {
-    "gulf": "Gulf business",
-    "energy": "Energy & shipping",
-    "tech": "Tech & AI",
-    "mena": "Wider MENA",
+    "sovereign_funds": "Sovereign funds",
+    "companies": "Companies & deals",
+    "people": "People",
+    "royals": "Royals",
+    "culture": "Culture",
+    "oil_geopolitics": "Oil & geopolitics",
+    # legacy labels still present in posted_log.json
+    "gulf": "Companies & deals",
+    "energy": "Oil & geopolitics",
+    "tech": "Companies & deals",
+    "mena": "Companies & deals",
 }
 
 
