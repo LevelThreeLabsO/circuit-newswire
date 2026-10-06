@@ -1,27 +1,29 @@
 {
-  "started_at": "2026-10-06T11:16:26+00:00",
-  "finished_at": "2026-10-06T11:18:36+00:00",
-  "duration_seconds": 130.6,
+  "started_at": "2026-10-06T11:31:25+00:00",
+  "finished_at": "2026-10-06T11:31:41+00:00",
+  "duration_seconds": 15.4,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 4,
-    "fresh": 1,
-    "relevant": 1,
-    "unseen": 1,
-    "unique": 1,
-    "posted": 1
+    "fetched": 16,
+    "fresh": 13,
+    "relevant": 3,
+    "unseen": 2,
+    "unique": 2,
+    "posted": 2
   },
-  "posted": 1,
+  "posted": 2,
   "delivered": true,
-  "last_posted_at": "2026-10-06T11:18:36+00:00",
+  "last_posted_at": "2026-10-06T11:31:41+00:00",
   "sources": {
     "bloomberg": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:bloomberg.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Kuwait%20OR%20Aramco%20OR%20ADNOC%20OR%20PIF%20OR%20Mubadala)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "reuters": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:reuters.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Kuwait%20OR%20Oman%20OR%20Bahrain%20OR%20Aramco%20OR%20ADNOC)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 99
     },
     "thenational": {
       "status": "ok",
@@ -39,28 +41,34 @@
       "in_window": 25
     },
     "zawya": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:zawya.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 1,
+      "in_window": 100
     },
     "arabnews": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:arabnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20energy%20OR%20PIF%20OR%20Aramco)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "wsj": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:wsj.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Aramco%20OR%20sovereign%20wealth)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 17
     },
     "nyt": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:nytimes.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar%20OR%20Aramco%20OR%20sovereign%20wealth%20fund)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 1
     },
     "wam": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:wam.ae%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 74
     },
     "arabianbusiness": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:arabianbusiness.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 10
     },
     "forbesme": {
       "status": "ok",
@@ -68,28 +76,34 @@
       "in_window": 500
     },
     "meed": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:meed.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 5
     },
     "semafor": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:semafor.com%20(Gulf%20OR%20Saudi%20OR%20UAE%20OR%20Qatar)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 1,
+      "in_window": 36
     },
     "argaam": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:argaam.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 63
     },
     "spa": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:spa.gov.sa%20(investment%20OR%20economy%20OR%20energy%20OR%20agreement%20OR%20fund)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 25
     },
     "khaleejtimes": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:khaleejtimes.com%20(business%20OR%20economy%20OR%20investment%20OR%20markets%20OR%20energy)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "gulfnews": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:gulfnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20markets%20OR%20energy)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 3,
+      "in_window": 100
     },
     "intelligenceonline": {
       "status": "ok",
@@ -97,52 +111,64 @@
       "in_window": 50
     },
     "peninsula": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:thepeninsulaqatar.com%20(business%20OR%20economy%20OR%20investment%20OR%20energy%20OR%20QIA)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 4,
+      "in_window": 100
     },
     "q_sovereign_funds": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Public%20Investment%20Fund\"%20OR%20Mubadala%20OR%20ADIA%20OR%20ADQ%20OR%20\"Qatar%20Investment%20Authority\"%20OR%20MGX%20OR%20Lunate%20OR%20Sanabil)%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_energy_champions": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(ADNOC%20OR%20Aramco%20OR%20QatarEnergy%20OR%20Masdar%20OR%20\"ACWA%20Power\"%20OR%20TAQA%20OR%20Ma%27aden%20OR%20SABIC)%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"m"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_ports_logistics": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"DP%20World\"%20OR%20\"AD%20Ports\"%20OR%20\"Etihad%20Rail\"%20OR%20Nakilat%20OR%20\"Abu%20Dhabi%20Ports\"%20OR%20Aramex)%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"matc"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_giga_projects": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(NEOM%20OR%20Qiddiya%20OR%20Diriyah%20OR%20\"Red%20Sea%20Global\"%20OR%20Roshn%20OR%20AlUla%20OR%20\"Qatari%20Diar\")%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_gulf_tech": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(G42%20OR%20Core42%20OR%20Space42%20OR%20Presight%20OR%20Humain%20OR%20\"stc%20Group\"%20OR%20Careem%20OR%20Talabat)%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_hormuz": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Strait%20of%20Hormuz\"%20OR%20\"war%20risk%20insurance\"%20OR%20\"Gulf%20shipping\"%20OR%20\"Red%20Sea%20shipping\")%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "tradewinds": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:tradewindsnews.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 28
     },
     "lloydslist": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:lloydslist.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 1,
+      "in_window": 18
     },
     "argus": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:argusmedia.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 16
     },
     "energyintel": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:energyintel.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 26
     },
     "upstream": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:upstreamonline.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 1,
+      "in_window": 28
     },
     "gcaptain": {
       "status": "ok",
@@ -155,8 +181,9 @@
       "in_window": 15
     },
     "tradearabia": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:tradearabia.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 37
     },
     "saudigazette": {
       "status": "ok",
@@ -164,24 +191,29 @@
       "in_window": 50
     },
     "q_listings": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=((Tadawul%20OR%20ADX%20OR%20\"Dubai%20Financial%20Market\"%20OR%20\"Saudi%20Exchange\")%20(IPO%20OR%20listing%20OR%20\"rights%20issue\"%20OR%20sukuk))%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_small_funds": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Kuwait%20Investment%20Authority\"%20OR%20Wafra%20OR%20Mumtalakat%20OR%20\"Oman%20Investment%20Authority\"%20OR%20\"Sovereign%20Fund%20of%20Egypt\")%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "gulftimes": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:gulf-times.com%20(business%20OR%20economy%20OR%20investment%20OR%20QIA%20OR%20energy)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 79
     },
     "moroccoworld": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:moroccoworldnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20finance%20OR%20energy)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 57
     },
     "ahram": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:english.ahram.org.eg%20(business%20OR%20economy%20OR%20investment%20OR%20IMF%20OR%20energy%20OR%20Suez)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "adgm": {
       "status": "ok",
@@ -189,8 +221,9 @@
       "in_window": 12
     },
     "difc": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:difc.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 1
     },
     "dfsa": {
       "status": "ok",
@@ -198,100 +231,110 @@
       "in_window": 9
     },
     "admediaoffice": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:mediaoffice.abudhabi%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 14
     },
     "dubaimediaoffice": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:mediaoffice.ae%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 1,
+      "in_window": 5
     },
     "zawya_people": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:zawya.com%20(appoints%20OR%20appointed%20OR%20\"named%20CEO\"%20OR%20\"chief%20executive\"%20OR%20promoted%20OR%20\"steps%20down\"%20OR%20\"managing%20director\")%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 95
     },
     "arabianbusiness_people": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:arabianbusiness.com%20(appoints%20OR%20appointed%20OR%20CEO%20OR%20\"steps%20down\"%20OR%20promoted%20OR%20\"joins%20as\"%20OR%20billionaire)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 19
     },
     "gulfbusiness_people": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:gulfbusiness.com%20(appoints%20OR%20appointed%20OR%20CEO%20OR%20\"managing%20director\"%20OR%20interview)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 6
     },
     "q_bankers": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=((Goldman%20OR%20JPMorgan%20OR%20\"Morgan%20Stanley\"%20OR%20Citi%20OR%20HSBC%20OR%20Rothschild%20OR%20Lazard%20OR%20Moelis%20OR%20\"Standard%20Chartered\"%20OR%20Barclays%20OR%20UBS%20OR%20BlackRock%20OR%20Blackstone%20OR%20KKR%20OR%20Apollo"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 6
     },
     "q_royals": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=((\"Sheikh%20Tahnoon\"%20OR%20\"Sheikh%20Tahnoun\"%20OR%20\"Sheikh%20Mansour\"%20OR%20\"Sheikh%20Hamdan\"%20OR%20\"Sheikh%20Khaled\"%20OR%20\"Sheikha%20Latifa\"%20OR%20\"Sheikha%20Mozah\"%20OR%20\"Sheikha%20Moza\"%20OR%20\"Prince%20Alwaleed\"%20OR%20\"Crown"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 78
     },
     "national_culture": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:thenationalnews.com%20(arts%20OR%20culture%20OR%20museum%20OR%20festival%20OR%20exhibition%20OR%20film%20OR%20fashion%20OR%20concert%20OR%20gallery%20OR%20biennale)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 65
     },
     "q_culture": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Art%20Dubai\"%20OR%20\"Louvre%20Abu%20Dhabi\"%20OR%20\"Riyadh%20Season\"%20OR%20\"Diriyah%20Biennale\"%20OR%20\"Red%20Sea%20Film%20Festival\"%20OR%20\"Dubai%20Opera\")%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "calcalist": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:calcalistech.com%20(Gulf%20OR%20UAE%20OR%20Saudi%20OR%20\"Abu%20Dhabi\"%20OR%20Dubai%20OR%20Qatar%20OR%20Emirati%20OR%20Mubadala%20OR%20acquires%20OR%20acquisition%20OR%20raises%20OR%20\"sovereign%20wealth\")%20when:1d&hl=en-US&gl=US&cei"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 14
     }
   },
   "consecutive_empty": {
-    "bloomberg": 11,
-    "reuters": 4,
-    "thenational": 1,
-    "agbi": 14,
-    "ft": 3,
-    "zawya": 1,
-    "arabnews": 1,
-    "wsj": 1,
-    "nyt": 123,
-    "wam": 50,
-    "arabianbusiness": 17,
+    "bloomberg": 12,
+    "reuters": 5,
+    "thenational": 2,
+    "agbi": 15,
+    "ft": 4,
+    "zawya": 0,
+    "arabnews": 2,
+    "wsj": 2,
+    "nyt": 124,
+    "wam": 51,
+    "arabianbusiness": 18,
     "forbesme": 0,
-    "meed": 9,
-    "semafor": 1,
-    "argaam": 16,
-    "spa": 4,
-    "khaleejtimes": 1,
-    "gulfnews": 1,
-    "intelligenceonline": 3803,
-    "peninsula": 2,
-    "q_sovereign_funds": 3,
-    "q_energy_champions": 12,
-    "q_ports_logistics": 3,
-    "q_giga_projects": 1,
-    "q_gulf_tech": 14,
-    "q_hormuz": 2,
-    "tradewinds": 1,
-    "lloydslist": 20,
-    "argus": 1,
-    "energyintel": 2,
-    "upstream": 9,
-    "gcaptain": 10,
-    "marineinsight": 88,
-    "tradearabia": 3790,
-    "saudigazette": 55,
-    "q_listings": 21,
-    "q_small_funds": 470,
-    "gulftimes": 4,
-    "moroccoworld": 1,
-    "ahram": 1,
+    "meed": 10,
+    "semafor": 0,
+    "argaam": 17,
+    "spa": 5,
+    "khaleejtimes": 2,
+    "gulfnews": 0,
+    "intelligenceonline": 3804,
+    "peninsula": 0,
+    "q_sovereign_funds": 4,
+    "q_energy_champions": 13,
+    "q_ports_logistics": 4,
+    "q_giga_projects": 2,
+    "q_gulf_tech": 15,
+    "q_hormuz": 3,
+    "tradewinds": 2,
+    "lloydslist": 0,
+    "argus": 2,
+    "energyintel": 3,
+    "upstream": 0,
+    "gcaptain": 11,
+    "marineinsight": 89,
+    "tradearabia": 3791,
+    "saudigazette": 56,
+    "q_listings": 22,
+    "q_small_funds": 471,
+    "gulftimes": 5,
+    "moroccoworld": 2,
+    "ahram": 2,
     "adgm": 0,
-    "difc": 2707,
+    "difc": 2708,
     "dfsa": 0,
-    "admediaoffice": 17,
-    "dubaimediaoffice": 76,
-    "zawya_people": 3,
-    "arabianbusiness_people": 9,
-    "gulfbusiness_people": 5,
-    "q_bankers": 379,
-    "q_royals": 285,
-    "national_culture": 1,
-    "q_culture": 379,
-    "calcalist": 3
+    "admediaoffice": 18,
+    "dubaimediaoffice": 0,
+    "zawya_people": 4,
+    "arabianbusiness_people": 10,
+    "gulfbusiness_people": 6,
+    "q_bankers": 380,
+    "q_royals": 286,
+    "national_culture": 2,
+    "q_culture": 380,
+    "calcalist": 4
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
