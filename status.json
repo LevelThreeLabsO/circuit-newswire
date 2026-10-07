@@ -1,11 +1,11 @@
 {
-  "started_at": "2026-10-07T21:01:31+00:00",
-  "finished_at": "2026-10-07T21:01:52+00:00",
-  "duration_seconds": 20.1,
+  "started_at": "2026-10-07T21:16:23+00:00",
+  "finished_at": "2026-10-07T21:17:50+00:00",
+  "duration_seconds": 86.5,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 21,
-    "fresh": 7,
+    "fetched": 11,
+    "fresh": 11,
     "relevant": 1,
     "unseen": 1,
     "unique": 0
@@ -52,26 +52,26 @@
     "wsj": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 8
+      "in_window": 7
     },
     "nyt": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 2
+      "in_window": 3
     },
     "wam": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 90
+      "in_window": 92
     },
     "arabianbusiness": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 8
+      "in_window": 7
     },
     "forbesme": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 500
     },
     "meed": {
@@ -97,7 +97,7 @@
     "khaleejtimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 90
+      "in_window": 88
     },
     "gulfnews": {
       "status": "ok",
@@ -112,7 +112,7 @@
     "peninsula": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 83
+      "in_window": 85
     },
     "q_sovereign_funds": {
       "status": "ok",
@@ -147,7 +147,7 @@
     "tradewinds": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 27
+      "in_window": 29
     },
     "lloydslist": {
       "status": "ok",
@@ -156,13 +156,13 @@
     },
     "argus": {
       "status": "ok",
-      "fetched": 2,
-      "in_window": 22
+      "fetched": 1,
+      "in_window": 23
     },
     "energyintel": {
       "status": "ok",
-      "fetched": 1,
-      "in_window": 35
+      "fetched": 3,
+      "in_window": 38
     },
     "upstream": {
       "status": "ok",
@@ -170,24 +170,21 @@
       "in_window": 17
     },
     "gcaptain": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 12
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='gcaptain.com', port=443): Max retries exceeded with url: /feed/ (Caused by NameResolutionError(\"HTTPSConnection(host='gcaptain.com', port=443): Failed to resolve 'gcaptain.com' ([Errno -3] Temporary failure in name resolution)\"))"
     },
     "marineinsight": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 15
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.marineinsight.com', port=443): Max retries exceeded with url: /feed/ (Caused by NameResolutionError(\"HTTPSConnection(host='www.marineinsight.com', port=443): Failed to resolve 'www.marineinsight.com' ([Errno -3] Temporary failure in name resolution)\"))"
     },
     "tradearabia": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 37
+      "in_window": 35
     },
     "saudigazette": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 50
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='saudigazette.com.sa', port=443): Max retries exceeded with url: /rssFeed/74 (Caused by NameResolutionError(\"HTTPSConnection(host='saudigazette.com.sa', port=443): Failed to resolve 'saudigazette.com.sa' ([Errno -3] Temporary failure in name resolution)\"))"
     },
     "q_listings": {
       "status": "ok",
@@ -201,12 +198,12 @@
     },
     "gulftimes": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 54
+      "fetched": 1,
+      "in_window": 53
     },
     "moroccoworld": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 2,
       "in_window": 76
     },
     "ahram": {
@@ -215,9 +212,8 @@
       "in_window": 100
     },
     "adgm": {
-      "status": "ok",
-      "fetched": 12,
-      "in_window": 12
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.adgm.com', port=443): Max retries exceeded with url: /media/announcements (Caused by NameResolutionError(\"HTTPSConnection(host='www.adgm.com', port=443): Failed to resolve 'www.adgm.com' ([Errno -3] Temporary failure in name resolution)\"))"
     },
     "difc": {
       "status": "ok",
@@ -225,14 +221,13 @@
       "in_window": 0
     },
     "dfsa": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 9
+      "status": "error",
+      "detail": "ConnectionError: HTTPSConnectionPool(host='www.dfsa.ae', port=443): Max retries exceeded with url: /news (Caused by NameResolutionError(\"HTTPSConnection(host='www.dfsa.ae', port=443): Failed to resolve 'www.dfsa.ae' ([Errno -3] Temporary failure in name resolution)\"))"
     },
     "admediaoffice": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 4
+      "in_window": 5
     },
     "dubaimediaoffice": {
       "status": "ok",
@@ -247,7 +242,7 @@
     "arabianbusiness_people": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 6
+      "in_window": 5
     },
     "gulfbusiness_people": {
       "status": "ok",
@@ -267,7 +262,7 @@
     "national_culture": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 56
+      "in_window": 53
     },
     "q_culture": {
       "status": "ok",
@@ -282,58 +277,58 @@
   },
   "consecutive_empty": {
     "bloomberg": 0,
-    "reuters": 1,
-    "thenational": 16,
-    "agbi": 27,
-    "ft": 3,
-    "zawya": 10,
+    "reuters": 2,
+    "thenational": 17,
+    "agbi": 28,
+    "ft": 4,
+    "zawya": 11,
     "arabnews": 0,
-    "wsj": 7,
-    "nyt": 16,
-    "wam": 118,
-    "arabianbusiness": 51,
-    "forbesme": 3,
-    "meed": 34,
-    "semafor": 8,
-    "argaam": 15,
-    "spa": 101,
-    "khaleejtimes": 9,
-    "gulfnews": 1,
-    "intelligenceonline": 3941,
-    "peninsula": 2,
+    "wsj": 8,
+    "nyt": 17,
+    "wam": 119,
+    "arabianbusiness": 52,
+    "forbesme": 0,
+    "meed": 35,
+    "semafor": 9,
+    "argaam": 16,
+    "spa": 102,
+    "khaleejtimes": 10,
+    "gulfnews": 2,
+    "intelligenceonline": 3942,
+    "peninsula": 3,
     "q_sovereign_funds": 0,
-    "q_energy_champions": 7,
-    "q_ports_logistics": 1,
-    "q_giga_projects": 9,
-    "q_gulf_tech": 25,
-    "q_hormuz": 26,
-    "tradewinds": 1,
-    "lloydslist": 17,
+    "q_energy_champions": 8,
+    "q_ports_logistics": 2,
+    "q_giga_projects": 10,
+    "q_gulf_tech": 26,
+    "q_hormuz": 27,
+    "tradewinds": 2,
+    "lloydslist": 18,
     "argus": 0,
     "energyintel": 0,
-    "upstream": 2,
-    "gcaptain": 8,
-    "marineinsight": 23,
-    "tradearabia": 3928,
-    "saudigazette": 1,
-    "q_listings": 159,
-    "q_small_funds": 130,
-    "gulftimes": 96,
+    "upstream": 3,
+    "gcaptain": 9,
+    "marineinsight": 24,
+    "tradearabia": 3929,
+    "saudigazette": 2,
+    "q_listings": 160,
+    "q_small_funds": 131,
+    "gulftimes": 0,
     "moroccoworld": 0,
-    "ahram": 8,
-    "adgm": 0,
-    "difc": 2845,
-    "dfsa": 0,
-    "admediaoffice": 155,
-    "dubaimediaoffice": 13,
-    "zawya_people": 10,
-    "arabianbusiness_people": 30,
-    "gulfbusiness_people": 38,
-    "q_bankers": 517,
-    "q_royals": 423,
-    "national_culture": 6,
-    "q_culture": 33,
-    "calcalist": 6
+    "ahram": 9,
+    "adgm": 1,
+    "difc": 2846,
+    "dfsa": 1,
+    "admediaoffice": 156,
+    "dubaimediaoffice": 14,
+    "zawya_people": 11,
+    "arabianbusiness_people": 31,
+    "gulfbusiness_people": 39,
+    "q_bankers": 518,
+    "q_royals": 424,
+    "national_culture": 7,
+    "q_culture": 34,
+    "calcalist": 7
   },
   "consecutive_parse_fail": {
     "bloomberg": 0,
