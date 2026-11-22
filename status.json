@@ -1,29 +1,29 @@
 {
-  "started_at": "2026-11-22T13:01:22+00:00",
-  "finished_at": "2026-11-22T13:01:43+00:00",
-  "duration_seconds": 20.5,
+  "started_at": "2026-11-22T13:16:24+00:00",
+  "finished_at": "2026-11-22T13:16:44+00:00",
+  "duration_seconds": 19.3,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 32,
-    "fresh": 21,
-    "relevant": 4,
-    "unseen": 3,
-    "unique": 2,
-    "posted": 2
+    "fetched": 34,
+    "fresh": 23,
+    "relevant": 3,
+    "unseen": 1,
+    "unique": 1,
+    "posted": 1
   },
-  "posted": 2,
+  "posted": 1,
   "delivered": true,
-  "last_posted_at": "2026-11-22T13:01:43+00:00",
+  "last_posted_at": "2026-11-22T13:16:44+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 9
+      "fetched": 1,
+      "in_window": 10
     },
     "reuters": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 37
+      "fetched": 1,
+      "in_window": 34
     },
     "thenational": {
       "status": "ok",
@@ -41,12 +41,13 @@
     },
     "zawya": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 18
     },
     "arabnews": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 429 from https://news.google.com/rss/search?q=site:arabnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20energy%20OR%20PIF%20OR%20Aramco)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 3,
+      "in_window": 100
     },
     "wsj": {
       "status": "ok",
@@ -60,8 +61,8 @@
     },
     "wam": {
       "status": "ok",
-      "fetched": 3,
-      "in_window": 59
+      "fetched": 1,
+      "in_window": 57
     },
     "arabianbusiness": {
       "status": "ok",
@@ -70,7 +71,7 @@
     },
     "forbesme": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 500
     },
     "meed": {
@@ -85,22 +86,22 @@
     },
     "argaam": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 30
     },
     "spa": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 2,
       "in_window": 22
     },
     "khaleejtimes": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 67
+      "fetched": 1,
+      "in_window": 66
     },
     "gulfnews": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 60
     },
     "intelligenceonline": {
@@ -110,12 +111,13 @@
     },
     "peninsula": {
       "status": "ok",
-      "fetched": 2,
-      "in_window": 56
+      "fetched": 4,
+      "in_window": 59
     },
     "q_sovereign_funds": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 429 from https://news.google.com/rss/search?q=(\"Public%20Investment%20Fund\"%20OR%20Mubadala%20OR%20ADIA%20OR%20ADQ%20OR%20\"Qatar%20Investment%20Authority\"%20OR%20MGX%20OR%20Lunate%20OR%20Sanabil)%20-site:circuit.news%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "q_energy_champions": {
       "status": "ok",
@@ -129,7 +131,7 @@
     },
     "q_giga_projects": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 0,
       "in_window": 100
     },
     "q_gulf_tech": {
@@ -155,7 +157,7 @@
     "argus": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 7
+      "in_window": 8
     },
     "energyintel": {
       "status": "ok",
@@ -264,8 +266,8 @@
     },
     "national_culture": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 38
+      "fetched": 2,
+      "in_window": 40
     },
     "q_culture": {
       "status": "ok",
@@ -274,63 +276,63 @@
     },
     "calcalist": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 13
     }
   },
   "consecutive_empty": {
-    "bloomberg": 17,
-    "reuters": 5,
-    "thenational": 2,
-    "agbi": 3888,
-    "ft": 214,
-    "zawya": 0,
-    "arabnews": 1,
+    "bloomberg": 0,
+    "reuters": 0,
+    "thenational": 3,
+    "agbi": 3889,
+    "ft": 215,
+    "zawya": 1,
+    "arabnews": 0,
     "wsj": 0,
-    "nyt": 20,
+    "nyt": 21,
     "wam": 0,
-    "arabianbusiness": 204,
+    "arabianbusiness": 205,
     "forbesme": 0,
-    "meed": 203,
-    "semafor": 166,
-    "argaam": 0,
+    "meed": 204,
+    "semafor": 167,
+    "argaam": 1,
     "spa": 0,
-    "khaleejtimes": 1,
+    "khaleejtimes": 0,
     "gulfnews": 0,
-    "intelligenceonline": 8511,
+    "intelligenceonline": 8512,
     "peninsula": 0,
-    "q_sovereign_funds": 73,
-    "q_energy_champions": 7,
-    "q_ports_logistics": 2,
-    "q_giga_projects": 0,
-    "q_gulf_tech": 94,
-    "q_hormuz": 3,
-    "tradewinds": 19,
-    "lloydslist": 159,
-    "argus": 88,
-    "energyintel": 108,
-    "upstream": 183,
-    "gcaptain": 83,
-    "marineinsight": 94,
-    "tradearabia": 804,
-    "saudigazette": 81,
-    "q_listings": 30,
-    "q_small_funds": 12,
-    "gulftimes": 1,
-    "moroccoworld": 1,
+    "q_sovereign_funds": 74,
+    "q_energy_champions": 8,
+    "q_ports_logistics": 3,
+    "q_giga_projects": 1,
+    "q_gulf_tech": 95,
+    "q_hormuz": 4,
+    "tradewinds": 20,
+    "lloydslist": 160,
+    "argus": 89,
+    "energyintel": 109,
+    "upstream": 184,
+    "gcaptain": 84,
+    "marineinsight": 95,
+    "tradearabia": 805,
+    "saudigazette": 82,
+    "q_listings": 31,
+    "q_small_funds": 13,
+    "gulftimes": 2,
+    "moroccoworld": 2,
     "ahram": 0,
     "adgm": 0,
-    "difc": 307,
-    "dfsa": 895,
-    "admediaoffice": 4725,
-    "dubaimediaoffice": 8,
-    "zawya_people": 1,
-    "arabianbusiness_people": 11,
-    "gulfbusiness_people": 211,
-    "q_bankers": 5087,
-    "q_royals": 486,
-    "national_culture": 2,
-    "q_culture": 27,
+    "difc": 308,
+    "dfsa": 896,
+    "admediaoffice": 4726,
+    "dubaimediaoffice": 9,
+    "zawya_people": 2,
+    "arabianbusiness_people": 12,
+    "gulfbusiness_people": 212,
+    "q_bankers": 5088,
+    "q_royals": 487,
+    "national_culture": 0,
+    "q_culture": 28,
     "calcalist": 0
   },
   "consecutive_parse_fail": {
