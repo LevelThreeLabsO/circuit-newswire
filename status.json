@@ -1,29 +1,28 @@
 {
-  "started_at": "2026-11-27T15:01:27+00:00",
-  "finished_at": "2026-11-27T15:01:46+00:00",
-  "duration_seconds": 18.9,
+  "started_at": "2026-11-27T15:02:02+00:00",
+  "finished_at": "2026-11-27T15:02:18+00:00",
+  "duration_seconds": 16.4,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 21,
-    "fresh": 19,
+    "fetched": 25,
+    "fresh": 23,
     "relevant": 1,
-    "unseen": 1,
-    "unique": 1,
-    "posted": 1
+    "unseen": 0,
+    "unique": 0
   },
-  "posted": 1,
-  "delivered": true,
-  "last_posted_at": "2026-11-27T15:01:46+00:00",
+  "posted": 0,
+  "delivered": null,
+  "last_posted_at": "2026-11-27T14:46:38+00:00",
   "sources": {
     "bloomberg": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "fetched": 2,
+      "in_window": 83
     },
     "reuters": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 100
+      "in_window": 78
     },
     "thenational": {
       "status": "ok",
@@ -45,8 +44,9 @@
       "in_window": 72
     },
     "arabnews": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 429 from https://news.google.com/rss/search?q=site:arabnews.com%20(business%20OR%20economy%20OR%20investment%20OR%20energy%20OR%20PIF%20OR%20Aramco)%20when:1d&hl=en-US&gl=US&ceid=US:en"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 100
     },
     "wsj": {
       "status": "ok",
@@ -91,17 +91,17 @@
     "spa": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 26
+      "in_window": 29
     },
     "khaleejtimes": {
       "status": "ok",
       "fetched": 6,
-      "in_window": 92
+      "in_window": 100
     },
     "gulfnews": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 69
+      "in_window": 68
     },
     "intelligenceonline": {
       "status": "ok",
@@ -115,7 +115,7 @@
     },
     "q_sovereign_funds": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 100
     },
     "q_energy_champions": {
@@ -156,7 +156,7 @@
     "argus": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 60
+      "in_window": 57
     },
     "energyintel": {
       "status": "ok",
@@ -181,7 +181,7 @@
     "tradearabia": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 13
+      "in_window": 12
     },
     "saudigazette": {
       "status": "ok",
@@ -201,7 +201,7 @@
     "gulftimes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 36
+      "in_window": 34
     },
     "moroccoworld": {
       "status": "ok",
@@ -210,8 +210,8 @@
     },
     "ahram": {
       "status": "ok",
-      "fetched": 3,
-      "in_window": 92
+      "fetched": 4,
+      "in_window": 91
     },
     "adgm": {
       "status": "ok",
@@ -241,7 +241,7 @@
     "zawya_people": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 74
+      "in_window": 72
     },
     "arabianbusiness_people": {
       "status": "ok",
@@ -251,7 +251,7 @@
     "gulfbusiness_people": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 5
+      "in_window": 3
     },
     "q_bankers": {
       "status": "ok",
@@ -261,7 +261,7 @@
     "q_royals": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 78
+      "in_window": 31
     },
     "national_culture": {
       "status": "ok",
@@ -280,7 +280,7 @@
     }
   },
   "consecutive_empty": {
-    "bloomberg": 1,
+    "bloomberg": 0,
     "reuters": 0,
     "thenational": 4,
     "agbi": 4387,
@@ -300,7 +300,7 @@
     "gulfnews": 52,
     "intelligenceonline": 9010,
     "peninsula": 0,
-    "q_sovereign_funds": 14,
+    "q_sovereign_funds": 0,
     "q_energy_champions": 0,
     "q_ports_logistics": 15,
     "q_giga_projects": 17,
